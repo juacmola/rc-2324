@@ -9,32 +9,28 @@ import java.net.SocketTimeoutException;
 
 import es.um.redes.nanoFiles.udp.message.DirMessage;
 import es.um.redes.nanoFiles.udp.message.DirMessageOps;
+import es.um.redes.nanoFiles.udp.server.NFDirectoryServer;
 import es.um.redes.nanoFiles.util.FileInfo;
 
 /**
  * Cliente con métodos de consulta y actualización específicos del directorio
  */
 public class DirectoryConnector {
-	/**
-	 * Puerto en el que atienden los servidores de directorio
-	 */
+	/** Puerto en el que atienden los servidores de directorio */
 	private static final int DIRECTORY_PORT = 6868;
-	/**
-	 * Tiempo máximo en milisegundos que se esperará a recibir una respuesta por el
+	
+	/** Tiempo máximo en milisegundos que se esperará a recibir una respuesta por el
 	 * socket antes de que se deba lanzar una excepción SocketTimeoutException para
-	 * recuperar el control
-	 */
+	 * recuperar el control */
 	private static final int TIMEOUT = 1000;
-	/**
-	 * Número de intentos máximos para obtener del directorio una respuesta a una
+	
+	/** Número de intentos máximos para obtener del directorio una respuesta a una
 	 * solicitud enviada. Cada vez que expira el timeout sin recibir respuesta se
-	 * cuenta como un intento.
-	 */
+	 * cuenta como un intento. */
 	private static final int MAX_NUMBER_OF_ATTEMPTS = 5;
 
 	/**
-	 * Valor inválido de la clave de sesión, antes de ser obtenida del directorio al
-	 * loguearse
+	 * Valor inválido de la clave de sesión, antes de ser obtenida del directorio al loguearse
 	 */
 	public static final int INVALID_SESSION_KEY = -1;
 
@@ -52,18 +48,14 @@ public class DirectoryConnector {
 	private String errorDescription;
 
 	public DirectoryConnector(String address) throws IOException {
-		/*
-		 * TODO: Convertir el nombre de host 'address' a InetAddress y guardar la
-		 * dirección de socket (address:DIRECTORY_PORT) del directorio en el atributo
-		 * directoryAddress, para poder enviar datagramas a dicho destino.
-		 */
-		/*
-		 * TODO: Crea el socket UDP en cualquier puerto para enviar datagramas al
-		 * directorio
-		 */
-
-
-
+		/* DONE: Convertir el nombre de host 'address' a InetAddress y guardar la dirección de socket (address:DIRECTORY_PORT) 
+		 * del directorio en el atributo directoryAddress, para poder enviar datagramas a dicho destino. */
+		InetAddress serverIp = InetAddress.getByName(address);
+		directoryAddress = new InetSocketAddress(serverIp, NFDirectoryServer.DIRECTORY_PORT);
+		
+		/* DONE: Crea el socket UDP en cualquier puerto para enviar datagramas al directorio */
+		socket = new DatagramSocket();
+		System.out.println("Created UDP socket at local addresss " + socket.getLocalSocketAddress());
 	}
 
 	/**
@@ -93,6 +85,8 @@ public class DirectoryConnector {
 		 * array devuelto debe contener únicamente los datos recibidos, *NO* el búfer de
 		 * recepción al completo.
 		 */
+		
+		
 		/*
 		 * TODO: Una vez el envío y recepción asumiendo un canal confiable (sin
 		 * pérdidas) esté terminado y probado, debe implementarse un mecanismo de
@@ -100,12 +94,16 @@ public class DirectoryConnector {
 		 * el plazo de TIMEOUT. En caso de salte el timeout, se debe reintentar como
 		 * máximo en MAX_NUMBER_OF_ATTEMPTS ocasiones.
 		 */
+		
+		
 		/*
 		 * TODO: Las excepciones que puedan lanzarse al leer/escribir en el socket deben
 		 * ser capturadas y tratadas en este método. Si se produce una excepción de
 		 * entrada/salida (error del que no es posible recuperarse), se debe informar y
 		 * terminar el programa.
 		 */
+		
+		
 		/*
 		 * NOTA: Las excepciones deben tratarse de la más concreta a la más genérica.
 		 * SocketTimeoutException es más concreta que IOException.
