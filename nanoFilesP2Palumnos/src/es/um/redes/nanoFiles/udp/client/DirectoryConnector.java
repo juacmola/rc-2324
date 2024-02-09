@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 
+import javax.sound.midi.SysexMessage;
+
 import es.um.redes.nanoFiles.udp.message.DirMessage;
 import es.um.redes.nanoFiles.udp.message.DirMessageOps;
 import es.um.redes.nanoFiles.udp.server.NFDirectoryServer;
@@ -63,10 +65,15 @@ public class DirectoryConnector {
 	 * 
 	 * @param requestData los datos a enviar al directorio (mensaje de solicitud)
 	 * @return los datos recibidos del directorio (mensaje de respuesta)
+	 * @throws IOException 
 	 */
-	private byte[] sendAndReceiveDatagrams(byte[] requestData) {
+	private byte[] sendAndReceiveDatagrams(byte[] requestData) throws IOException {
 		byte responseData[] = new byte[DirMessage.PACKET_MAX_SIZE];
 		byte response[] = null;
+		
+		boolean paqueteRecibido=false;
+		int numeroIntentos=0;
+		
 		if (directoryAddress == null) {
 			System.err.println("DirectoryConnector.sendAndReceiveDatagrams: UDP server destination address is null!");
 			System.err.println(
@@ -80,36 +87,42 @@ public class DirectoryConnector {
 					"DirectoryConnector.sendAndReceiveDatagrams: make sure constructor initializes field \"socket\"");
 			System.exit(-1);
 		}
-		/*
-		 * TODO: Enviar datos en un datagrama al directorio y recibir una respuesta. El
+		/* TODO: Enviar datos en un datagrama al directorio y recibir una respuesta. El
 		 * array devuelto debe contener únicamente los datos recibidos, *NO* el búfer de
-		 * recepción al completo.
-		 */
+		 * recepción al completo. */
+		DatagramPacket packetToDirectory = new DatagramPacket(requestData, requestData.length, directoryAddress);
+		System.out.println("Press Enter key to send the message...");
+		socket.send(packetToDirectory);
 		
+		DatagramPacket packetFromDirectory = new DatagramPacket(response, responseData.length);
+		socket.setSoTimeout(TIMEOUT);
 		
-		/*
-		 * TODO: Una vez el envío y recepción asumiendo un canal confiable (sin
+		/* TODO: Una vez el envío y recepción asumiendo un canal confiable (sin
 		 * pérdidas) esté terminado y probado, debe implementarse un mecanismo de
 		 * retransmisión usando temporizador, en caso de que no se reciba respuesta en
 		 * el plazo de TIMEOUT. En caso de salte el timeout, se debe reintentar como
-		 * máximo en MAX_NUMBER_OF_ATTEMPTS ocasiones.
-		 */
-		
-		
-		/*
-		 * TODO: Las excepciones que puedan lanzarse al leer/escribir en el socket deben
+		 * máximo en MAX_NUMBER_OF_ATTEMPTS ocasiones. */
+		/* TODO: Las excepciones que puedan lanzarse al leer/escribir en el socket deben
 		 * ser capturadas y tratadas en este método. Si se produce una excepción de
 		 * entrada/salida (error del que no es posible recuperarse), se debe informar y
-		 * terminar el programa.
-		 */
-		
-		
-		/*
-		 * NOTA: Las excepciones deben tratarse de la más concreta a la más genérica.
-		 * SocketTimeoutException es más concreta que IOException.
-		 */
+		 * terminar el programa.*/
+		while(!paqueteRecibido&&numeroIntentos<MAX_NUMBER_OF_ATTEMPTS) {
+			try{
+				socket.receive(packetFromDirectory);
+				paqueteRecibido=true;
 
-
+			}
+			catch(SocketTimeoutException e) {
+				socket.send(packetToDirectory);
+				numeroIntentos++;
+			}catch(IOException e) {
+				System.out.println("There was an IOException" + e.getMessage());
+				System.exit(1);
+			}
+		}
+		
+		/* NOTA: Las excepciones deben tratarse de la más concreta a la más genérica.
+		 * SocketTimeoutException es más concreta que IOException.*/
 
 		if (response != null && response.length == responseData.length) {
 			System.err.println("Your response is as large as the datagram reception buffer!!\n"
