@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
+import java.util.Arrays;
 
 import javax.sound.midi.SysexMessage;
 
@@ -52,11 +53,11 @@ public class DirectoryConnector {
 	public DirectoryConnector(String address) throws IOException {
 		/* DONE: Convertir el nombre de host 'address' a InetAddress y guardar la dirección de socket (address:DIRECTORY_PORT) 
 		 * del directorio en el atributo directoryAddress, para poder enviar datagramas a dicho destino. */
-		InetAddress serverIp = InetAddress.getByName(address);
-		directoryAddress = new InetSocketAddress(serverIp, NFDirectoryServer.DIRECTORY_PORT);
+		InetAddress directoryIp = InetAddress.getByName(address);
+		this.directoryAddress = new InetSocketAddress(directoryIp, NFDirectoryServer.DIRECTORY_PORT);
 		
 		/* DONE: Crea el socket UDP en cualquier puerto para enviar datagramas al directorio */
-		socket = new DatagramSocket();
+		this.socket = new DatagramSocket();
 		System.out.println("Created UDP socket at local addresss " + socket.getLocalSocketAddress());
 	}
 
@@ -105,13 +106,15 @@ public class DirectoryConnector {
 		System.out.println("Press Enter key to send the message...");
 		socket.send(packetToDirectory);
 		
-		DatagramPacket packetFromDirectory = new DatagramPacket(response, responseData.length);
+		DatagramPacket packetFromDirectory = new DatagramPacket(responseData, responseData.length);
 		socket.setSoTimeout(TIMEOUT);
 		
 		while(!paqueteRecibido&&numeroIntentos<MAX_NUMBER_OF_ATTEMPTS) {
 			try{
 				socket.receive(packetFromDirectory);
-				paqueteRecibido=true;
+				String messageFromDirectory = new String(responseData, 0, packetFromDirectory.getLength());
+				response = messageFromDirectory.getBytes();
+				paqueteRecibido = true;
 			}catch(SocketTimeoutException e) {
 				socket.send(packetToDirectory);
 				numeroIntentos++;
@@ -133,17 +136,24 @@ public class DirectoryConnector {
 	 * recepción de mensajes sin formatear ("en crudo")
 	 * 
 	 * @return verdadero si se ha enviado un datagrama y recibido una respuesta
+	 * @throws IOException 
 	 */
-	public boolean testSendAndReceive() {
-		/*
-		 * TODO: Probar el correcto funcionamiento de sendAndReceiveDatagrams. Se debe
-		 * enviar un datagrama con la cadena "login" y comprobar que la respuesta
-		 * recibida es "loginok". En tal caso, devuelve verdadero, falso si la respuesta
-		 * no contiene los datos esperados.
-		 */
+	public boolean testSendAndReceive() throws IOException {
+		/* DONE: Probar el correcto funcionamiento de sendAndReceiveDatagrams. Se debe enviar un datagrama con 
+		 * la cadena "login" y comprobar que la respuesta recibida es "loginok". En tal caso, devuelve verdadero, 
+		 * falso si la respuesta no contiene los datos esperados.*/
 		boolean success = false;
-
-
+		
+		final String messageToDirectory = DirMessageOps.OPERATION_LOGIN;
+		byte[] login = messageToDirectory.getBytes();
+		System.out.println("Sending message to server: \"" + messageToDirectory + "\"");
+		
+		byte[] datafromDirectory = sendAndReceiveDatagrams(login);
+		DatagramPacket packetFromDirectory = new DatagramPacket(datafromDirectory, datafromDirectory.length);
+		String messageFromDirectory = new String(datafromDirectory, 0, packetFromDirectory.getLength());
+		
+		System.out.println(" Reception buffer contents: " + messageFromDirectory);
+		if (messageFromDirectory.equals(DirMessageOps.OPERATION_LOGINOK)) success = true;
 
 		return success;
 	}
@@ -168,13 +178,11 @@ public class DirectoryConnector {
 		assert (sessionKey == INVALID_SESSION_KEY);
 		boolean success = false;
 		// TODO: 1.Crear el mensaje a enviar (objeto DirMessage) con atributos adecuados
-		// (operation, etc.) NOTA: Usar como operaciones las constantes definidas en la clase
-		// DirMessageOps
+		// (operation, etc.) NOTA: Usar como operaciones las constantes definidas en la clase DirMessageOps
 		// TODO: 2.Convertir el objeto DirMessage a enviar a un string (método toString)
 		// TODO: 3.Crear un datagrama con los bytes en que se codifica la cadena
 		// TODO: 4.Enviar datagrama y recibir una respuesta (sendAndReceiveDatagrams).
-		// TODO: 5.Convertir respuesta recibida en un objeto DirMessage (método
-		// DirMessage.fromString)
+		// TODO: 5.Convertir respuesta recibida en un objeto DirMessage (método DirMessage.fromString)
 		// TODO: 6.Extraer datos del objeto DirMessage y procesarlos (p.ej., sessionKey)
 		// TODO: 7.Devolver éxito/fracaso de la operación
 
