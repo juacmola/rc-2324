@@ -87,17 +87,10 @@ public class DirectoryConnector {
 					"DirectoryConnector.sendAndReceiveDatagrams: make sure constructor initializes field \"socket\"");
 			System.exit(-1);
 		}
-		/* TODO: Enviar datos en un datagrama al directorio y recibir una respuesta. El
+		/* DONE: Enviar datos en un datagrama al directorio y recibir una respuesta. El
 		 * array devuelto debe contener únicamente los datos recibidos, *NO* el búfer de
 		 * recepción al completo. */
-		DatagramPacket packetToDirectory = new DatagramPacket(requestData, requestData.length, directoryAddress);
-		System.out.println("Press Enter key to send the message...");
-		socket.send(packetToDirectory);
-		
-		DatagramPacket packetFromDirectory = new DatagramPacket(response, responseData.length);
-		socket.setSoTimeout(TIMEOUT);
-		
-		/* TODO: Una vez el envío y recepción asumiendo un canal confiable (sin
+		/* DONE: Una vez el envío y recepción asumiendo un canal confiable (sin
 		 * pérdidas) esté terminado y probado, debe implementarse un mecanismo de
 		 * retransmisión usando temporizador, en caso de que no se reciba respuesta en
 		 * el plazo de TIMEOUT. En caso de salte el timeout, se debe reintentar como
@@ -106,13 +99,20 @@ public class DirectoryConnector {
 		 * ser capturadas y tratadas en este método. Si se produce una excepción de
 		 * entrada/salida (error del que no es posible recuperarse), se debe informar y
 		 * terminar el programa.*/
+		/* NOTA: Las excepciones deben tratarse de la más concreta a la más genérica.
+		 * SocketTimeoutException es más concreta que IOException.*/
+		DatagramPacket packetToDirectory = new DatagramPacket(requestData, requestData.length, directoryAddress);
+		System.out.println("Press Enter key to send the message...");
+		socket.send(packetToDirectory);
+		
+		DatagramPacket packetFromDirectory = new DatagramPacket(response, responseData.length);
+		socket.setSoTimeout(TIMEOUT);
+		
 		while(!paqueteRecibido&&numeroIntentos<MAX_NUMBER_OF_ATTEMPTS) {
 			try{
 				socket.receive(packetFromDirectory);
 				paqueteRecibido=true;
-
-			}
-			catch(SocketTimeoutException e) {
+			}catch(SocketTimeoutException e) {
 				socket.send(packetToDirectory);
 				numeroIntentos++;
 			}catch(IOException e) {
@@ -120,9 +120,6 @@ public class DirectoryConnector {
 				System.exit(1);
 			}
 		}
-		
-		/* NOTA: Las excepciones deben tratarse de la más concreta a la más genérica.
-		 * SocketTimeoutException es más concreta que IOException.*/
 
 		if (response != null && response.length == responseData.length) {
 			System.err.println("Your response is as large as the datagram reception buffer!!\n"
