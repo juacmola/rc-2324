@@ -1,5 +1,7 @@
 package es.um.redes.nanoFiles.application;
 
+import java.io.IOException;
+
 import es.um.redes.nanoFiles.logic.NFController;
 import es.um.redes.nanoFiles.util.FileDatabase;
 
@@ -12,9 +14,9 @@ public class NanoFiles {
 	 * Flag para pruebas iniciales, desactivado una vez que la comunicación
 	 * cliente-directorio está implementada y probada.
 	 */
-	public static boolean testMode = true;
+	public static boolean testMode = false;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		// Comprobamos los argumentos
 		if (args.length > 1) {
 			System.out
