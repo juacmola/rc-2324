@@ -58,7 +58,7 @@ public class DirectoryConnector {
 		
 		/* DONE: Crea el socket UDP en cualquier puerto para enviar datagramas al directorio */
 		this.socket = new DatagramSocket();
-		System.out.println("Created UDP socket at local addresss " + socket.getLocalSocketAddress());
+		System.out.println("Created UDP socket at local addresss " + socket.getLocalSocketAddress()); 		// Opcional
 	}
 
 	/**
@@ -96,14 +96,13 @@ public class DirectoryConnector {
 		 * retransmisión usando temporizador, en caso de que no se reciba respuesta en
 		 * el plazo de TIMEOUT. En caso de salte el timeout, se debe reintentar como
 		 * máximo en MAX_NUMBER_OF_ATTEMPTS ocasiones. */
-		/* TODO: Las excepciones que puedan lanzarse al leer/escribir en el socket deben
+		/* DONE: Las excepciones que puedan lanzarse al leer/escribir en el socket deben
 		 * ser capturadas y tratadas en este método. Si se produce una excepción de
 		 * entrada/salida (error del que no es posible recuperarse), se debe informar y
 		 * terminar el programa.*/
 		/* NOTA: Las excepciones deben tratarse de la más concreta a la más genérica.
 		 * SocketTimeoutException es más concreta que IOException.*/
 		DatagramPacket packetToDirectory = new DatagramPacket(requestData, requestData.length, directoryAddress);
-		System.out.println("Press Enter key to send the message...");
 		socket.send(packetToDirectory);
 		
 		DatagramPacket packetFromDirectory = new DatagramPacket(responseData, responseData.length);
@@ -146,13 +145,13 @@ public class DirectoryConnector {
 		
 		final String messageToDirectory = DirMessageOps.OPERATION_LOGIN;
 		byte[] login = messageToDirectory.getBytes();
-		System.out.println("Sending message to server: \"" + messageToDirectory + "\"");
+		System.out.println("Sending message to directory: \"" + messageToDirectory + "\"");	// Opcional
 		
 		byte[] datafromDirectory = sendAndReceiveDatagrams(login);
 		DatagramPacket packetFromDirectory = new DatagramPacket(datafromDirectory, datafromDirectory.length);
 		String messageFromDirectory = new String(datafromDirectory, 0, packetFromDirectory.getLength());
 		
-		System.out.println(" Reception buffer contents: " + messageFromDirectory);
+		System.out.println(" Reception buffer contents: " + messageFromDirectory);			// Opcional
 		if (messageFromDirectory.equals(DirMessageOps.OPERATION_LOGINOK)) success = true;
 
 		return success;
@@ -171,8 +170,7 @@ public class DirectoryConnector {
 	 * obtener la clave de sesión asociada a este usuario.
 	 * 
 	 * @param nickname El nickname del usuario a registrar
-	 * @return La clave de sesión asignada al usuario que acaba de loguearse, o -1
-	 *         en caso de error
+	 * @return La clave de sesión asignada al usuario que acaba de loguearse, o -1 en caso de error
 	 */
 	public boolean logIntoDirectory(String nickname) {
 		assert (sessionKey == INVALID_SESSION_KEY);
