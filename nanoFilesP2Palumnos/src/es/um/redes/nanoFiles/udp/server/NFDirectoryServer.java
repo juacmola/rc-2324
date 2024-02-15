@@ -127,6 +127,7 @@ public class NFDirectoryServer {
 					 * mensaje recibido no es "login", se informa del error y no se envía ninguna respuesta. */
 					if(messageFromClient.equals("login")) {
 						String messageToClient = new String("loginok");
+						//String messageToClient = new String("loginok&" + random.nextInt(10000));
 						byte[] dataToClient = messageToClient.getBytes();
 						System.out.println("Sending datagram with message \"" + messageToClient + "\"");			// Opcional
 						System.out.println("Destination is client at addr: " + clientAddr);							// Opcional
@@ -134,7 +135,13 @@ public class NFDirectoryServer {
 						socket.send(packetToClient);
 					}
 					else System.out.println("The message is not a 'login' message");
-
+					
+					double rand = Math.random();
+					if (rand < messageDiscardProbability) {
+						System.err.println("Directory DISCARDED datagram from " + clientAddr);
+						continue;
+					}
+					
 				} else { 	// Servidor funcionando en modo producción (mensajes bien formados)
 					// Vemos si el mensaje debe ser ignorado por la probabilidad de descarte
 					double rand = Math.random();
@@ -142,25 +149,20 @@ public class NFDirectoryServer {
 						System.err.println("Directory DISCARDED datagram from " + clientAddr);
 						continue;
 					}
-
-					/*
-					 * TODO: Construir String partir de los datos recibidos en el datagrama. A
+					/* TODO: Construir String partir de los datos recibidos en el datagrama. A
 					 * continuación, imprimir por pantalla dicha cadena a modo de depuración.
 					 * Después, usar la cadena para construir un objeto DirMessage que contenga en
-					 * sus atributos los valores del mensaje (fromString).
-					 */
-					/*
-					 * TODO: Llamar a buildResponseFromRequest para construir, a partir del objeto
+					 * sus atributos los valores del mensaje (fromString).*/
+					
+					/* TODO: Llamar a buildResponseFromRequest para construir, a partir del objeto
 					 * DirMessage con los valores del mensaje de petición recibido, un nuevo objeto
 					 * DirMessage con el mensaje de respuesta a enviar. Los atributos del objeto
 					 * DirMessage de respuesta deben haber sido establecidos con los valores
-					 * adecuados para los diferentes campos del mensaje (operation, etc.)
-					 */
-					/*
-					 * TODO: Convertir en string el objeto DirMessage con el mensaje de respuesta a
+					 * adecuados para los diferentes campos del mensaje (operation, etc.)*/
+					
+					/* TODO: Convertir en string el objeto DirMessage con el mensaje de respuesta a
 					 * enviar, extraer los bytes en que se codifica el string (getBytes), y
-					 * finalmente enviarlos en un datagrama
-					 */
+					 * finalmente enviarlos en un datagrama*/
 
 
 
