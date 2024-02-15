@@ -76,7 +76,7 @@ public class NFController {
 	 * NFControllerLogicP2P según el comando.
 	 * @throws IOException 
 	 */
-	public void processCommand() throws IOException {
+	public void processCommand(){
 
 		if (!canProcessCommandInCurrentState()) {
 			return;
