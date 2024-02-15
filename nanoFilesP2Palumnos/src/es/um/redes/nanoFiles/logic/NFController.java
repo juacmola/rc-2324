@@ -74,8 +74,9 @@ public class NFController {
 	 * Método que procesa los comandos introducidos por un usuario. Se encarga
 	 * principalmente de invocar los métodos adecuados de NFControllerLogicDir y
 	 * NFControllerLogicP2P según el comando.
+	 * @throws IOException 
 	 */
-	public void processCommand() {
+	public void processCommand() throws IOException {
 
 		if (!canProcessCommandInCurrentState()) {
 			return;
