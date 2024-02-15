@@ -91,6 +91,11 @@ public class DirectoryConnector {
 		/* DONE: Enviar datos en un datagrama al directorio y recibir una respuesta. El
 		 * array devuelto debe contener únicamente los datos recibidos, *NO* el búfer de
 		 * recepción al completo. */
+		DatagramPacket packetToDirectory = new DatagramPacket(requestData, requestData.length, directoryAddress);
+		socket.send(packetToDirectory);
+		
+		DatagramPacket packetFromDirectory = new DatagramPacket(responseData, responseData.length);
+		
 		/* DONE: Una vez el envío y recepción asumiendo un canal confiable (sin
 		 * pérdidas) esté terminado y probado, debe implementarse un mecanismo de
 		 * retransmisión usando temporizador, en caso de que no se reciba respuesta en
@@ -102,12 +107,7 @@ public class DirectoryConnector {
 		 * terminar el programa.*/
 		/* NOTA: Las excepciones deben tratarse de la más concreta a la más genérica.
 		 * SocketTimeoutException es más concreta que IOException.*/
-		DatagramPacket packetToDirectory = new DatagramPacket(requestData, requestData.length, directoryAddress);
-		socket.send(packetToDirectory);
-		
-		DatagramPacket packetFromDirectory = new DatagramPacket(responseData, responseData.length);
-		socket.setSoTimeout(TIMEOUT);
-		
+		socket.setSoTimeout(TIMEOUT);	
 		while(!paqueteRecibido&&numeroIntentos<MAX_NUMBER_OF_ATTEMPTS) {
 			try{
 				socket.receive(packetFromDirectory);
