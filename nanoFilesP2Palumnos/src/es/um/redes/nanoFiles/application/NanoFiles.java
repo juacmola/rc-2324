@@ -14,14 +14,13 @@ public class NanoFiles {
 	 * Flag para pruebas iniciales, desactivado una vez que la comunicación
 	 * cliente-directorio está implementada y probada.
 	 */
-	public static boolean testMode = true;
-	//public static boolean testMode = false;
+	//public static boolean testMode = true;
+	public static boolean testMode = false;
 
 	public static void main(String[] args){
 		// Comprobamos los argumentos
 		if (args.length > 1) {
-			System.out
-					.println("Usage: java -jar NanoFiles.jar [<local_shared_directory>]");
+			System.out.println("Usage: java -jar NanoFiles.jar [<local_shared_directory>]");
 			return;
 		}
 		else if (args.length == 1) {
@@ -37,7 +36,11 @@ public class NanoFiles {
 		// shell hasta que el usuario quiera salir de la aplicación.
 		do {
 			controller.readGeneralCommandFromShell();
-			controller.processCommand();
+			try {
+				controller.processCommand();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		} while (controller.shouldQuit() == false);
 		System.out.println("Bye.");
 	}

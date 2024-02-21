@@ -107,21 +107,30 @@ public class DirectoryConnector {
 		 * terminar el programa.*/
 		/* NOTA: Las excepciones deben tratarse de la más concreta a la más genérica.
 		 * SocketTimeoutException es más concreta que IOException.*/
+		
 		socket.setSoTimeout(TIMEOUT);	
-		while(!paqueteRecibido&&numeroIntentos<MAX_NUMBER_OF_ATTEMPTS) {
+		while(!paqueteRecibido && numeroIntentos < MAX_NUMBER_OF_ATTEMPTS) {
+	
 			try{
 				socket.receive(packetFromDirectory);
 				String messageFromDirectory = new String(responseData, 0, packetFromDirectory.getLength());
 				response = messageFromDirectory.getBytes();
 				paqueteRecibido = true;
+				
 			}catch(SocketTimeoutException e) {
 				System.out.println("Timeout is over. Trying again... ");
 				socket.send(packetToDirectory);
 				numeroIntentos++;
+				
 			}catch(IOException e) {
-				System.out.println("There was an IOException" + e.getMessage());
+				System.err.println("There was an IOException" + e.getMessage());
 				System.exit(1);
 			}
+		}
+		
+		if (numeroIntentos == MAX_NUMBER_OF_ATTEMPTS) {
+			System.err.println("The maximum number of resend attempts has been exceeded. Aborting communication with the directory...");
+			System.exit(1);
 		}
 
 		if (response != null && response.length == responseData.length) {
@@ -144,16 +153,18 @@ public class DirectoryConnector {
 		 * falso si la respuesta no contiene los datos esperados.*/
 		boolean success = false;
 		
-		final String messageToDirectory = DirMessageOps.OPERATION_LOGIN;
+		String messageToDirectory = DirMessageOps.OPERATION_LOGIN;
 		byte[] login = messageToDirectory.getBytes();
 		System.out.println("Sending message to directory: \"" + messageToDirectory + "\"");	// Opcional
 		
 		byte[] datafromDirectory = sendAndReceiveDatagrams(login);
-		DatagramPacket packetFromDirectory = new DatagramPacket(datafromDirectory, datafromDirectory.length);
-		String messageFromDirectory = new String(datafromDirectory, 0, packetFromDirectory.getLength());
+		//DatagramPacket packetFromDirectory = new DatagramPacket(datafromDirectory, datafromDirectory.length);		Estas dos lineas de codigo se pueden sustituir por la siguiente debido a que la funcion "sendAndReceiveDatagrams" ya devuelve un array de bytes limpio
+		//String messageFromDirectory = new String(datafromDirectory, 0, packetFromDirectory.getLength());			con la respuesta del servidor.
+		String messageFromDirectory = new String(datafromDirectory);
 		
 		System.out.println(" Reception buffer contents: " + messageFromDirectory);			// Opcional
-		if (messageFromDirectory.equals(DirMessageOps.OPERATION_LOGINOK)) success = true;
+		if (messageFromDirectory.equals(DirMessageOps.OPERATION_LOGINOK))
+			success = true;
 
 		return success;
 	}
@@ -173,21 +184,56 @@ public class DirectoryConnector {
 	 * @param nickname El nickname del usuario a registrar
 	 * @return La clave de sesión asignada al usuario que acaba de loguearse, o -1 en caso de error
 	 */
-	public boolean logIntoDirectory(String nickname) {
+	//El codigo comentado servira mas adelante
+	public int logIntoDirectory(String nickname) {
+	//public boolean logIntoDirectory(String nickname) {
 		assert (sessionKey == INVALID_SESSION_KEY);
-		boolean success = false;
-		// TODO: 1.Crear el mensaje a enviar (objeto DirMessage) con atributos adecuados
+		//boolean success = false;
+		// DONE: 1.Crear el mensaje a enviar (objeto DirMessage) con atributos adecuados
 		// (operation, etc.) NOTA: Usar como operaciones las constantes definidas en la clase DirMessageOps
-		// TODO: 2.Convertir el objeto DirMessage a enviar a un string (método toString)
-		// TODO: 3.Crear un datagrama con los bytes en que se codifica la cadena
-		// TODO: 4.Enviar datagrama y recibir una respuesta (sendAndReceiveDatagrams).
-		// TODO: 5.Convertir respuesta recibida en un objeto DirMessage (método DirMessage.fromString)
+		// DONE: 2.Convertir el objeto DirMessage a enviar a un string (método toString)
+		// DONE: 3.Crear un datagrama con los bytes en que se codifica la cadena
+		// DONE: 4.Enviar datagrama y recibir una respuesta (sendAndReceiveDatagrams).
+		// DONE: 5.Convertir respuesta recibida en un objeto DirMessage (método DirMessage.fromString)
 		// TODO: 6.Extraer datos del objeto DirMessage y procesarlos (p.ej., sessionKey)
 		// TODO: 7.Devolver éxito/fracaso de la operación
+		
+		/*
+		DirMessage dirMessage = new DirMessage(DirMessageOps.OPERATION_LOGIN, nickname);
+		String dirMessageToDirectory = dirMessage.toString();
+		byte[] requestData = dirMessageToDirectory.getBytes();
+		try {
+			response = sendAndReceiveDatagrams(requestData);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String responseFromDirectory = new String(response);
+		DirMessage dirMessageFromDirectory = DirMessage.fromString(responseFromDirectory);
+		*/
+		byte response[] = null;
+		String messageToDirectory = new String("login&" + nickname);
+		try {
+			response = sendAndReceiveDatagrams(messageToDirectory.getBytes());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		String responseFromDirectory = new String(response);
+		String[] responseFromDirectorySplit = responseFromDirectory.split("&");
+		String loginok = responseFromDirectorySplit[0];
+		int num = Integer.parseInt(responseFromDirectorySplit[1]);
+		
+		if (loginok.equals("loginok") && num >= 0 && num <= 10000) {
+			sessionKey = num;
+			System.out.println(nickname + " has logged in successfully (" + sessionKey + ").");
+		}
+		
+		else {
+			System.err.println(nickname + " couldn't log in correctly.");
+		}
+		
 
-
-
-		return success;
+		return sessionKey;
 	}
 
 	/**

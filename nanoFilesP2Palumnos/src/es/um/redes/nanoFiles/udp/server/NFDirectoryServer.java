@@ -59,16 +59,15 @@ public class NFDirectoryServer {
 	public NFDirectoryServer(double corruptionProbability) throws SocketException {
 		/* Guardar la probabilidad de pérdida de datagramas (simular enlace no
 		 * confiable) */
-		messageDiscardProbability = corruptionProbability;
+		this.messageDiscardProbability = corruptionProbability;
 		/* DONE: (Boletín UDP) Inicializar el atributo socket: Crear un socket UDP
 		 * ligado al puerto especificado por el argumento directoryPort en la máquina local */
-		socket = new DatagramSocket(DIRECTORY_PORT);
+		this.socket = new DatagramSocket(DIRECTORY_PORT);
 		
 		/* DONE: (Boletín UDP) Inicializar el resto de atributos de esta clase
 		 * (estructuras de datos que mantiene el servidor: nicks, sessionKeys, etc.) */
 		this.nicks = new HashMap<>();
 		this.sessionKeys = new HashMap<>();
-
 
 		if (NanoFiles.testMode) {
 			if (socket == null || nicks == null || sessionKeys == null) {
@@ -100,8 +99,6 @@ public class NFDirectoryServer {
 			// obtenida del datagrama recibido
 			clientAddr = (InetSocketAddress) packetFromClient.getSocketAddress();
 
-
-
 			if (NanoFiles.testMode) {
 				if (receptionBuffer == null || clientAddr == null || dataLength < 0) {
 					System.err.println("NFDirectoryServer.run: code not yet fully functional.\n"
@@ -125,7 +122,7 @@ public class NFDirectoryServer {
 					/* DONE: (Boletín UDP) Comprobar que se ha recibido un datagrama con la cadena "login" y en 
 					 * ese caso enviar como respuesta un mensaje al cliente con la cadena "loginok". Si el 
 					 * mensaje recibido no es "login", se informa del error y no se envía ninguna respuesta. */
-					if(messageFromClient.equals("login")) {
+					if (messageFromClient.equals("login")) {
 						String messageToClient = new String("loginok");
 						//String messageToClient = new String("loginok&" + random.nextInt(10000));
 						byte[] dataToClient = messageToClient.getBytes();
@@ -134,39 +131,66 @@ public class NFDirectoryServer {
 						DatagramPacket packetToClient = new DatagramPacket(dataToClient, dataToClient.length, clientAddr);
 						socket.send(packetToClient);
 					}
-					else System.out.println("The message is not a 'login' message");
 					
-					double rand = Math.random();
+					else
+						System.err.println("The message is not a 'login' message");
+					
+					double rand = Math.random();												//Revisar, parece duplicado
 					if (rand < messageDiscardProbability) {
 						System.err.println("Directory DISCARDED datagram from " + clientAddr);
 						continue;
 					}
 					
-				} else { 	// Servidor funcionando en modo producción (mensajes bien formados)
+				} else { 	// Servidor funcionando en modo producción (mensajes bien formados), el codigo comentado servira mas adelante
 					// Vemos si el mensaje debe ser ignorado por la probabilidad de descarte
 					double rand = Math.random();
 					if (rand < messageDiscardProbability) {
 						System.err.println("Directory DISCARDED datagram from " + clientAddr);
 						continue;
 					}
-					/* TODO: Construir String partir de los datos recibidos en el datagrama. A
+					/* DONE: Construir String partir de los datos recibidos en el datagrama. A
 					 * continuación, imprimir por pantalla dicha cadena a modo de depuración.
 					 * Después, usar la cadena para construir un objeto DirMessage que contenga en
 					 * sus atributos los valores del mensaje (fromString).*/
+					System.out.println(" Contents interpreted as " + packetFromClient.getLength() + "-byte String: \"" + messageFromClient + "\"");
+					//DirMessage dirMessageFromClient = DirMessage.fromString(messageFromClient);
 					
-					/* TODO: Llamar a buildResponseFromRequest para construir, a partir del objeto
+					/* DONE: Llamar a buildResponseFromRequest para construir, a partir del objeto
 					 * DirMessage con los valores del mensaje de petición recibido, un nuevo objeto
 					 * DirMessage con el mensaje de respuesta a enviar. Los atributos del objeto
 					 * DirMessage de respuesta deben haber sido establecidos con los valores
 					 * adecuados para los diferentes campos del mensaje (operation, etc.)*/
+					//DirMessage dirMessageToClient = buildResponseFromRequest(dirMessageFromClient, clientAddr);
 					
-					/* TODO: Convertir en string el objeto DirMessage con el mensaje de respuesta a
+					/* DONE: Convertir en string el objeto DirMessage con el mensaje de respuesta a
 					 * enviar, extraer los bytes en que se codifica el string (getBytes), y
 					 * finalmente enviarlos en un datagrama*/
-
-
+					//String messageToClient = dirMessageToClient.toString();
+					//byte[] dataToClient = messageToClient.getBytes();
+					//DatagramPacket packetToClient = new DatagramPacket(dataToClient, dataToClient.length, clientAddr);
+					//socket.send(packetToClient);
+					
+					String[] messageFromClientSplit = messageFromClient.split("&");
+					String messageToClient;
+					
+					if (messageFromClientSplit[0].equals("login")) {
+						if (!nicks.containsKey(messageFromClientSplit[1])) {
+							int sessionKey = random.nextInt(10001);
+							nicks.put(messageFromClientSplit[1], sessionKey);
+							messageToClient = new String("loginok&" + sessionKey);
+						}
+						
+						else {
+							messageToClient = new String("login_failed:-1");
+						}
+						
+						byte[] dataToClient = messageToClient.getBytes();
+						DatagramPacket packetToClient = new DatagramPacket(dataToClient, dataToClient.length, clientAddr);
+						socket.send(packetToClient);
+					}
 
 				}
+				
 			} else {
 				System.err.println("Directory ignores EMPTY datagram from " + clientAddr);
 			}
@@ -193,24 +217,35 @@ public class NFDirectoryServer {
 			String username = msg.getNickname();
 
 			/*
-			 * TODO: Comprobamos si tenemos dicho usuario registrado (atributo "nicks"). Si
+			 * DONE: Comprobamos si tenemos dicho usuario registrado (atributo "nicks"). Si
 			 * no está, generamos su sessionKey (número aleatorio entre 0 y 1000) y añadimos
 			 * el nick y su sessionKey asociada. NOTA: Puedes usar random.nextInt(10000)
 			 * para generar la session key
 			 */
+			
+			if (nicks.containsKey(username)) {
+				System.out.println("User " + username + " is already connected.");
+			}
+			
+			else {
+				int sessionKey = random.nextInt(10000);
+				nicks.put(username, sessionKey);
+				sessionKeys.put(sessionKey, username);
+			}
+			
 			/*
-			 * TODO: Construimos un mensaje de respuesta que indique el éxito/fracaso del
+			 * DONE: Construimos un mensaje de respuesta que indique el éxito/fracaso del
 			 * login y contenga la sessionKey en caso de éxito, y lo devolvemos como
 			 * resultado del método.
 			 */
+			DirMessage dirMessageToClient = new DirMessage(operation, username, nicks.get(username));
+			
 			/*
-			 * TODO: Imprimimos por pantalla el resultado de procesar la petición recibida
+			 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
 			 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
 			 * servidor
 			 */
-
-
-
+			System.out.print("Username: " + dirMessageToClient.getNickname() + "\nSession key: " + dirMessageToClient.getSessionKey() + "\n");
 			break;
 		}
 
