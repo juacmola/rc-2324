@@ -62,14 +62,10 @@ public class NFControllerLogicDir {
 		
 		this.directoryConnector = new DirectoryConnector(directoryHostname); 
 		
-		//result = directoryConnector.logIntoDirectory(nickname);
-		int sessionKey = directoryConnector.logIntoDirectory(nickname);
+		result = directoryConnector.logIntoDirectory(nickname);
 		
-		//if (result)
-		if (sessionKey >= 0) {
-			System.out.println("Login was successful with " + sessionKey + " key");
-			result = true;
-		}
+		if (result)
+			System.out.println("Login was successful with " + directoryConnector.getSessionKey() + " key");
 		
 		else 
 			System.err.println("Login was unsuccessful");

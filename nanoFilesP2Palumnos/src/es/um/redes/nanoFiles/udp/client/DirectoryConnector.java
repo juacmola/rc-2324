@@ -185,10 +185,9 @@ public class DirectoryConnector {
 	 * @return La clave de sesión asignada al usuario que acaba de loguearse, o -1 en caso de error
 	 */
 	//El codigo comentado servira mas adelante
-	public int logIntoDirectory(String nickname) {
-	//public boolean logIntoDirectory(String nickname) {
+	public boolean logIntoDirectory(String nickname) {
 		assert (sessionKey == INVALID_SESSION_KEY);
-		//boolean success = false;
+		boolean success = false;
 		// DONE: 1.Crear el mensaje a enviar (objeto DirMessage) con atributos adecuados
 		// (operation, etc.) NOTA: Usar como operaciones las constantes definidas en la clase DirMessageOps
 		// DONE: 2.Convertir el objeto DirMessage a enviar a un string (método toString)
@@ -224,6 +223,7 @@ public class DirectoryConnector {
 		int num = Integer.parseInt(responseFromDirectorySplit[1]);
 		
 		if (loginok.equals("loginok") && num >= 0 && num <= 10000) {
+			success = true;
 			sessionKey = num;
 			System.out.println(nickname + " has logged in successfully (" + sessionKey + ").");
 		}
@@ -232,8 +232,7 @@ public class DirectoryConnector {
 			System.err.println(nickname + " couldn't log in correctly.");
 		}
 		
-
-		return sessionKey;
+		return success;
 	}
 
 	/**
