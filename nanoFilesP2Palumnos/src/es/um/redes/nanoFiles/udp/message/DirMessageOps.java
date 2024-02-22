@@ -9,6 +9,8 @@ public class DirMessageOps {
 	public static final String OPERATION_INVALID = "invalid_operation";
 	public static final String OPERATION_LOGIN = "login";
 	public static final String OPERATION_LOGINOK = "loginok";
+	public static final String NICKNAME_INVALID = "invalid_nickname";
+	public static final int SESSIONKEY_INVALID = -1;
 
 
 

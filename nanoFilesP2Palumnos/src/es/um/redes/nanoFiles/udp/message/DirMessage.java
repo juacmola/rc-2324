@@ -30,7 +30,8 @@ public class DirMessage {
 	 * TODO: Definir de manera simbólica los nombres de todos los campos que pueden
 	 * aparecer en los mensajes de este protocolo (formato campo:valor)
 	 */
-
+	private static final String FIELDNAME_NICKNAME = "nickname";
+	private static final String FIELDNAME_SESSIONKEY = "sessionKey";
 
 
 	/**
@@ -41,15 +42,27 @@ public class DirMessage {
 	 * TODO: Crear un atributo correspondiente a cada uno de los campos de los
 	 * diferentes mensajes de este protocolo.
 	 */
-	private String nickname;
+	private String nickname = DirMessageOps.NICKNAME_INVALID;
+	private int sessionKey = DirMessageOps.SESSIONKEY_INVALID;
 
 
 
 
 	public DirMessage(String op) {
-		operation = op;
+		this.operation = op;
 	}
-
+	
+	//Constructor para login
+	public DirMessage(String op, String nickname) {
+		this.operation = op;
+		this.nickname = nickname;
+	}
+	
+	public DirMessage(String op, String nickname, int sessionKey) {
+		this.operation = op;
+		this.nickname = nickname;
+		this.sessionKey = sessionKey;
+	}
 
 
 
@@ -61,20 +74,23 @@ public class DirMessage {
 	public String getOperation() {
 		return operation;
 	}
-
-	public void setNickname(String nick) {
-
-
-
-		nickname = nick;
-	}
-
+	
 	public String getNickname() {
-
-
-
 		return nickname;
 	}
+	
+	public int getSessionKey() {
+		return sessionKey;
+	}
+
+	public void setNickname(String nick) {
+		this.nickname = nick;
+	}
+
+	public void setSessionKey(int sessionKey) {
+		this.sessionKey = sessionKey;
+	}
+	
 
 
 
@@ -95,8 +111,8 @@ public class DirMessage {
 		 * guardarlo en variables locales.
 		 */
 
-		// System.out.println("DirMessage read from socket:");
-		// System.out.println(message);
+		System.out.println("DirMessage read from socket:");
+		System.out.println(message);
 		String[] lines = message.split(END_LINE + "");
 		// Local variables to save data during parsing
 		DirMessage m = null;
@@ -114,7 +130,16 @@ public class DirMessage {
 				m = new DirMessage(value);
 				break;
 			}
-
+			
+			case FIELDNAME_NICKNAME: {
+				m.setNickname(value);
+				break;
+			}
+			
+			case FIELDNAME_SESSIONKEY: {
+				int intValue = Integer.parseInt(value);
+				m.setSessionKey(intValue);
+			}
 
 
 
@@ -141,12 +166,20 @@ public class DirMessage {
 	public String toString() {
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(FIELDNAME_OPERATION + DELIMITER + operation + END_LINE); // Construimos el campo
+		sb.append(FIELDNAME_OPERATION + DELIMITER + this.operation + END_LINE); // Construimos el campo
 		/*
 		 * TODO: En función del tipo de mensaje, crear una cadena con el tipo y
 		 * concatenar el resto de campos necesarios usando los valores de los atributos
 		 * del objeto.
 		 */
+		switch(this.operation) {
+		case DirMessageOps.OPERATION_LOGIN: {
+			sb.append(FIELDNAME_NICKNAME + DELIMITER + nickname + END_LINE);
+			sb.append(FIELDNAME_SESSIONKEY + DELIMITER + sessionKey + END_LINE);
+			break;
+		}
+		
+		}
 
 
 
