@@ -124,7 +124,6 @@ public class NFDirectoryServer {
 					 * mensaje recibido no es "login", se informa del error y no se envía ninguna respuesta. */
 					if (messageFromClient.equals("login")) {
 						String messageToClient = new String("loginok");
-						//String messageToClient = new String("loginok&" + random.nextInt(10000));
 						byte[] dataToClient = messageToClient.getBytes();
 						System.out.println("Sending datagram with message \"" + messageToClient + "\"");			// Opcional
 						System.out.println("Destination is client at addr: " + clientAddr);							// Opcional
