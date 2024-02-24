@@ -1,0 +1,27 @@
+***LOGIN***
+
+operation: login/n
+nickname: pepe/n
+/n
+
+Un usuario enviaría este mensaje al directorio.
+Este mensaje es necesario para que cualquier usuario inicie sesión con su nombre
+en el directorio.
+Cuando el directorio reciba el mensaje, tiene que comprobar que el usuario no está
+registrado en el directorio. Si no está registrado, le asigna una clave de sesión
+y se la envía mediante un mensaje al usuario, que la necesitará para solicitudes
+posteriores.
+
+*ÉXITO*
+operation: loginok/n
+nickname: pepe/n
+sessionkey: 5000/n
+/n
+
+*FALLO*
+operation: loginfail/n
+nickname: pepe/n
+sessionkey: -1/n
+/n
+
+
