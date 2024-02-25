@@ -158,8 +158,6 @@ public class DirectoryConnector {
 		System.out.println("Sending message to directory: \"" + messageToDirectory + "\"");	// Opcional
 		
 		byte[] datafromDirectory = sendAndReceiveDatagrams(login);
-		//DatagramPacket packetFromDirectory = new DatagramPacket(datafromDirectory, datafromDirectory.length);		Estas dos lineas de codigo se pueden sustituir por la siguiente debido a que la funcion "sendAndReceiveDatagrams" ya devuelve un array de bytes limpio
-		//String messageFromDirectory = new String(datafromDirectory, 0, packetFromDirectory.getLength());			con la respuesta del servidor.
 		String messageFromDirectory = new String(datafromDirectory);
 		
 		System.out.println(" Reception buffer contents: " + messageFromDirectory);			// Opcional

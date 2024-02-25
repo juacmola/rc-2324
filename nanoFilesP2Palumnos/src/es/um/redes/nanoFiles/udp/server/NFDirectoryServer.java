@@ -134,12 +134,6 @@ public class NFDirectoryServer {
 					else
 						System.err.println("The message is not a 'login' message");
 					
-					double rand = Math.random();												//Revisar, parece duplicado
-					if (rand < messageDiscardProbability) {
-						System.err.println("Directory DISCARDED datagram from " + clientAddr);
-						continue;
-					}
-					
 				} else { 	// Servidor funcionando en modo producción (mensajes bien formados), el codigo comentado servira mas adelante
 					// Vemos si el mensaje debe ser ignorado por la probabilidad de descarte
 					double rand = Math.random();
@@ -237,14 +231,14 @@ public class NFDirectoryServer {
 			 * login y contenga la sessionKey en caso de éxito, y lo devolvemos como
 			 * resultado del método.
 			 */
-			DirMessage dirMessageToClient = new DirMessage(operation, username, nicks.get(username));
+			//DirMessage dirMessageToClient = new DirMessage(operation, username, nicks.get(username));
 			
 			/*
 			 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
 			 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
 			 * servidor
 			 */
-			System.out.print("Username: " + dirMessageToClient.getNickname() + "\nSession key: " + dirMessageToClient.getSessionKey() + "\n");
+			//System.out.print("Username: " + dirMessageToClient.getNickname() + "\nSession key: " + dirMessageToClient.getSessionKey() + "\n");
 			break;
 		}
 

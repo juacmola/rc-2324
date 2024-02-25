@@ -52,6 +52,11 @@ public class DirMessage {
 		this.operation = op;
 	}
 	
+	/*
+	 * TODO: Crear diferentes constructores adecuados para construir mensajes de
+	 * diferentes tipos con sus correspondientes argumentos (campos del mensaje)
+	 */
+	/*
 	//Constructor para login
 	public DirMessage(String op, String nickname) {
 		this.operation = op;
@@ -62,15 +67,10 @@ public class DirMessage {
 		this.operation = op;
 		this.nickname = nickname;
 		this.sessionKey = sessionKey;
-	}
-
-
-
-	/*
-	 * TODO: Crear diferentes constructores adecuados para construir mensajes de
-	 * diferentes tipos con sus correspondientes argumentos (campos del mensaje)
-	 */
-
+	} 
+	*/
+	
+	//Getters
 	public String getOperation() {
 		return operation;
 	}
@@ -82,7 +82,8 @@ public class DirMessage {
 	public int getSessionKey() {
 		return sessionKey;
 	}
-
+	
+	//Setters
 	public void setNickname(String nick) {
 		this.nickname = nick;
 	}
@@ -173,11 +174,17 @@ public class DirMessage {
 		 * del objeto.
 		 */
 		switch(this.operation) {
-		case DirMessageOps.OPERATION_LOGIN: {
-			sb.append(FIELDNAME_NICKNAME + DELIMITER + nickname + END_LINE);
-			sb.append(FIELDNAME_SESSIONKEY + DELIMITER + sessionKey + END_LINE);
-			break;
-		}
+			case DirMessageOps.OPERATION_LOGIN: {
+				sb.append(FIELDNAME_NICKNAME + DELIMITER + nickname + END_LINE);
+				break;
+			}
+			
+			case DirMessageOps.OPERATION_LOGINOK:
+			case DirMessageOps.OPERATION_LOGINFAIL: {
+				sb.append(FIELDNAME_NICKNAME + DELIMITER + nickname + END_LINE);
+				sb.append(FIELDNAME_SESSIONKEY + DELIMITER + sessionKey + END_LINE);
+				break;
+			}
 		
 		}
 
