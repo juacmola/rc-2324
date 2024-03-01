@@ -3,7 +3,9 @@ package es.um.redes.nanoFiles.udp.message;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.LinkedList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import es.um.redes.nanoFiles.util.FileInfo;
 
@@ -32,6 +34,7 @@ public class DirMessage {
 	 */
 	private static final String FIELDNAME_NICKNAME = "nickname";
 	private static final String FIELDNAME_SESSIONKEY = "sessionKey";
+	private static final String FIELDNAME_USER = "user";
 
 
 	/**
@@ -44,6 +47,7 @@ public class DirMessage {
 	 */
 	private String nickname = DirMessageOps.NICKNAME_INVALID;
 	private int sessionKey = DirMessageOps.SESSIONKEY_INVALID;
+	private HashSet<String> usersList = new HashSet<>();
 
 
 
@@ -56,19 +60,6 @@ public class DirMessage {
 	 * TODO: Crear diferentes constructores adecuados para construir mensajes de
 	 * diferentes tipos con sus correspondientes argumentos (campos del mensaje)
 	 */
-	/*
-	//Constructor para login
-	public DirMessage(String op, String nickname) {
-		this.operation = op;
-		this.nickname = nickname;
-	}
-	
-	public DirMessage(String op, String nickname, int sessionKey) {
-		this.operation = op;
-		this.nickname = nickname;
-		this.sessionKey = sessionKey;
-	} 
-	*/
 	
 	//Getters
 	public String getOperation() {
@@ -83,6 +74,10 @@ public class DirMessage {
 		return sessionKey;
 	}
 	
+	public Set<String> getUsersList() {
+		return Collections.unmodifiableSet(usersList);
+	}
+	
 	//Setters
 	public void setNickname(String nick) {
 		this.nickname = nick;
@@ -90,6 +85,10 @@ public class DirMessage {
 
 	public void setSessionKey(int sessionKey) {
 		this.sessionKey = sessionKey;
+	}
+	
+	public void setUsersList(HashSet<String> usersList) {
+		this.usersList = usersList;
 	}
 	
 
@@ -122,7 +121,7 @@ public class DirMessage {
 
 		for (String line : lines) {
 			int idx = line.indexOf(DELIMITER); // Posición del delimitador
-			String fieldName = line.substring(0, idx).toLowerCase(); // minúsculas
+			String fieldName = line.substring(0, idx);//.toLowerCase(); // minúsculas
 			String value = line.substring(idx + 1).trim();
 
 			switch (fieldName) {
@@ -133,13 +132,18 @@ public class DirMessage {
 			}
 			
 			case FIELDNAME_NICKNAME: {
-				m.setNickname(value);
+				m.nickname = value;
 				break;
 			}
 			
 			case FIELDNAME_SESSIONKEY: {
-				int intValue = Integer.parseInt(value);
-				m.setSessionKey(intValue);
+				m.sessionKey = Integer.parseInt(value);
+				break;
+			}
+			
+			case FIELDNAME_USER: {
+				m.usersList.add(value);
+				break;
 			}
 
 
@@ -167,13 +171,13 @@ public class DirMessage {
 	public String toString() {
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(FIELDNAME_OPERATION + DELIMITER + this.operation + END_LINE); // Construimos el campo
+		sb.append(FIELDNAME_OPERATION + DELIMITER + operation + END_LINE); // Construimos el campo
 		/*
 		 * TODO: En función del tipo de mensaje, crear una cadena con el tipo y
 		 * concatenar el resto de campos necesarios usando los valores de los atributos
 		 * del objeto.
 		 */
-		switch(this.operation) {
+		switch(operation) {
 			case DirMessageOps.OPERATION_LOGIN: {
 				sb.append(FIELDNAME_NICKNAME + DELIMITER + nickname + END_LINE);
 				break;
@@ -183,6 +187,18 @@ public class DirMessage {
 			case DirMessageOps.OPERATION_LOGINFAIL: {
 				sb.append(FIELDNAME_NICKNAME + DELIMITER + nickname + END_LINE);
 				sb.append(FIELDNAME_SESSIONKEY + DELIMITER + sessionKey + END_LINE);
+				break;
+			}
+			
+			case DirMessageOps.OPERATION_REGISTERED_USERS: {
+				sb.append(FIELDNAME_SESSIONKEY + DELIMITER + sessionKey + END_LINE);
+				break;
+			}
+			
+			case DirMessageOps.OPERATION_REGISTERED_USERS_RESP: {
+				for (String user : usersList)
+					sb.append(FIELDNAME_USER + DELIMITER + user + END_LINE);
+				
 				break;
 			}
 		

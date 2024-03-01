@@ -85,7 +85,13 @@ public class NFControllerLogicDir {
 		 */
 		boolean result = false;
 
-
+		result = directoryConnector.logoutFromDirectory();
+		
+		if (result)
+			System.out.println("Logout was successful with " + directoryConnector.getSessionKey() + " key");
+		
+		else 
+			System.err.println("Logout was unsuccessful");
 
 		return result;
 	}
@@ -100,6 +106,18 @@ public class NFControllerLogicDir {
 		 * e imprimirla por pantalla. Devolver éxito/fracaso de la operación.
 		 */
 		boolean result = false;
+		
+		String[] userList = directoryConnector.getUserList();
+		
+		if (userList != null) {
+			for (String user : userList)
+				System.out.println("user:" + user);
+		
+			result = true;
+		}
+		
+		else
+			System.out.println("The directory wasn't able to provide the list of users.");
 
 
 
