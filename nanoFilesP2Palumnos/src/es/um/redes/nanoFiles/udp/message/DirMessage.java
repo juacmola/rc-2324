@@ -89,7 +89,6 @@ public class DirMessage {
 	}
 	
 	public void setUsersList(HashMap<String, Integer> nicks) {
-		//this.usersList.clear();
 		this.usersList.addAll(nicks.keySet());
 	}
 	

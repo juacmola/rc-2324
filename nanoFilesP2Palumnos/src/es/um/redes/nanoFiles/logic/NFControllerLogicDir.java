@@ -108,7 +108,7 @@ public class NFControllerLogicDir {
 		boolean result = false;
 		
 		String[] userList = directoryConnector.getUserList();
-		//quizas haya que tocar lo de null
+		
 		if (userList != null) {
 			for (String user : userList)
 				System.out.println("user:" + user);
@@ -117,7 +117,7 @@ public class NFControllerLogicDir {
 		}
 		
 		else
-			System.out.println("The directory wasn't able to provide the list of users.");
+			System.err.println("The directory wasn't able to provide the list of users.");
 
 
 

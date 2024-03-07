@@ -224,7 +224,7 @@ public class NFDirectoryServer {
 				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
 				 * servidor
 				 */
-				System.out.print("operation:" + response.getOperation() + "\nnickname: " + response.getNickname() + "\nsessionKey: " + response.getSessionKey() + "\n\n");
+				System.out.print("operation:" + response.getOperation() + "\nnickname:" + response.getNickname() + "\nsessionKey:" + response.getSessionKey() + "\n\n");
 				break;
 			}
 			

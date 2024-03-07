@@ -228,18 +228,35 @@ public class NFController {
 		 */
 		boolean commandAllowed = true;
 		switch (currentCommand) {
-		case NFCommands.COM_MYFILES: {
-			commandAllowed = true;
-			break;
-		}
-		case NFCommands.COM_LOGIN:
-			if (currentState != LOGGED_OUT) {
-				commandAllowed = false;
-				System.err.println("* You cannot login because you are not logged out from the directory");
+		
+			case NFCommands.COM_MYFILES: {
+				commandAllowed = true;
+				break;
 			}
-			break;
-
-
+			
+			case NFCommands.COM_LOGIN: {
+				if (currentState != LOGGED_OUT) {
+					commandAllowed = false;
+					System.err.println("* You cannot login because you are not logged out from the directory");
+				}
+				break;
+			}
+			
+			case NFCommands.COM_LOGOUT : {
+				if (currentState != LOGGED_IN) {
+					commandAllowed = false;
+					System.err.println("* You cannot log out because you are not logged in to the directory");
+				}
+				break;
+			}
+			//Case generalizado para todos los mensajes que no suponen un cambio de estado en el autómata y que solo se pueden ejecutar si estás logueado en el directorio.
+			case NFCommands.COM_USERLIST : {
+				if (currentState != LOGGED_IN) {
+					commandAllowed = false;
+					System.err.println("*You cannot run this command because you are not logged into the directory");
+				}
+				break;
+			}
 
 		default:
 			// System.err.println("ERROR: undefined behaviour for " + currentCommand + "
@@ -258,12 +275,16 @@ public class NFController {
 			return;
 		}
 		switch (currentCommand) {
-		case NFCommands.COM_LOGIN: {
-			currentState = LOGGED_IN;
-			break;
-		}
-
-
+			case NFCommands.COM_LOGIN: {
+				currentState = LOGGED_IN;
+				break;
+			}
+		
+			case NFCommands.COM_LOGOUT: {
+				currentState = LOGGED_OUT;
+				break;
+			}
+		
 
 		default:
 		}
