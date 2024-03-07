@@ -79,7 +79,7 @@ public class NFControllerLogicDir {
 	 */
 	public boolean doLogout() {
 		/*
-		 * TODO: Comunicarse con el directorio (a través del directoryConnector) para
+		 * DONE: Comunicarse con el directorio (a través del directoryConnector) para
 		 * dar de baja a este usuario. Se debe enviar la clave de sesión para
 		 * identificarse. Devolver éxito/fracaso de la operación.
 		 */
@@ -88,7 +88,7 @@ public class NFControllerLogicDir {
 		result = directoryConnector.logoutFromDirectory();
 		
 		if (result)
-			System.out.println("Logout was successful with " + directoryConnector.getSessionKey() + " key");
+			System.out.println("Logout was successful");
 		
 		else 
 			System.err.println("Logout was unsuccessful");
@@ -108,7 +108,7 @@ public class NFControllerLogicDir {
 		boolean result = false;
 		
 		String[] userList = directoryConnector.getUserList();
-		
+		//quizas haya que tocar lo de null
 		if (userList != null) {
 			for (String user : userList)
 				System.out.println("user:" + user);

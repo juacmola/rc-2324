@@ -164,26 +164,6 @@ public class NFDirectoryServer {
 					DatagramPacket packetToClient = new DatagramPacket(dataToClient, dataToClient.length, clientAddr);
 					socket.send(packetToClient);
 					
-					/*mensaje en crudo
-					String[] messageFromClientSplit = messageFromClient.split("&");
-					String messageToClient;
-					
-					if (messageFromClientSplit[0].equals("login")) {
-						if (!nicks.containsKey(messageFromClientSplit[1])) {
-							int sessionKey = random.nextInt(10001);
-							nicks.put(messageFromClientSplit[1], sessionKey);
-							messageToClient = new String("loginok&" + sessionKey);
-						}
-						
-						else {
-							messageToClient = new String("login_failed:-1");
-						}
-						
-						byte[] dataToClient = messageToClient.getBytes();
-						DatagramPacket packetToClient = new DatagramPacket(dataToClient, dataToClient.length, clientAddr);
-						socket.send(packetToClient);
-					}
-					*/
 				}
 				
 			} else {
@@ -239,8 +219,6 @@ public class NFDirectoryServer {
 					response.setSessionKey(nicks.get(username));
 				}
 			
-			
-			
 				/*
 				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
 				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
@@ -252,7 +230,7 @@ public class NFDirectoryServer {
 			
 			case DirMessageOps.OPERATION_REGISTERED_USERS: {
 				response = new DirMessage(DirMessageOps.OPERATION_REGISTERED_USERS_RESP);
-				response.setUsersList((HashSet<String>) nicks.keySet());
+				response.setUsersList(nicks);
 				
 				/*
 				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
@@ -268,44 +246,22 @@ public class NFDirectoryServer {
 			}
 			
 			case DirMessageOps.OPERATION_LOGOUT: {
-				String username = msg.getNickname();
-
-				/*
-				 * DONE: Comprobamos si tenemos dicho usuario registrado (atributo "nicks"). Si
-				 * no está, generamos su sessionKey (número aleatorio entre 0 y 1000) y añadimos
-				 * el nick y su sessionKey asociada. NOTA: Puedes usar random.nextInt(10000)
-				 * para generar la session key
-				 */
-				/*
-				 * DONE: Construimos un mensaje de respuesta que indique el éxito/fracaso del
-				 * login y contenga la sessionKey en caso de éxito, y lo devolvemos como
-				 * resultado del método.
-				 */
-			
-				if (nicks.containsKey(username)) {
-					System.out.println("User " + username + " is already connected.");
-					response = new DirMessage(DirMessageOps.OPERATION_LOGINFAIL);
-					response.setNickname(username);
-					response.setSessionKey(DirMessageOps.SESSIONKEY_INVALID);
+				
+				if (sessionKeys.containsKey(msg.getSessionKey())) {
+					nicks.remove(sessionKeys.remove(msg.getSessionKey()));
+					response = new DirMessage(DirMessageOps.OPERATION_LOGOUTOK);
 				}
 			
 				else {
-					int sessionKey = random.nextInt(10001);
-					nicks.put(username, sessionKey);
-					sessionKeys.put(sessionKey, username);
-					response = new DirMessage(DirMessageOps.OPERATION_LOGINOK);
-					response.setNickname(username);
-					response.setSessionKey(nicks.get(username));
+					response = new DirMessage(DirMessageOps.OPERATION_LOGOUTFAIL);
 				}
-			
-			
 			
 				/*
 				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
 				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
 				 * servidor
 				 */
-				System.out.print("operation:" + response.getOperation() + "\nnickname: " + response.getNickname() + "\nsessionKey: " + response.getSessionKey() + "\n\n");
+				System.out.print("operation:" + response.getOperation() + "\n\n");
 				break;
 			}
 

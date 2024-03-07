@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -87,8 +88,9 @@ public class DirMessage {
 		this.sessionKey = sessionKey;
 	}
 	
-	public void setUsersList(HashSet<String> usersList) {
-		this.usersList = usersList;
+	public void setUsersList(HashMap<String, Integer> nicks) {
+		//this.usersList.clear();
+		this.usersList.addAll(nicks.keySet());
 	}
 	
 
@@ -190,7 +192,8 @@ public class DirMessage {
 				break;
 			}
 			
-			case DirMessageOps.OPERATION_REGISTERED_USERS: {
+			case DirMessageOps.OPERATION_REGISTERED_USERS:
+			case DirMessageOps.OPERATION_LOGOUT : {
 				sb.append(FIELDNAME_SESSIONKEY + DELIMITER + sessionKey + END_LINE);
 				break;
 			}
@@ -201,6 +204,8 @@ public class DirMessage {
 				
 				break;
 			}
+			
+			
 		
 		}
 
