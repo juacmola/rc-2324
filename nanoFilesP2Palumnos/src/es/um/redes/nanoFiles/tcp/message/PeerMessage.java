@@ -10,7 +10,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
-//import es.um.redes.nanoFiles.util.FileInfo;
+import es.um.redes.nanoFiles.util.FileInfo;
 
 public class PeerMessage {
 
