@@ -19,7 +19,7 @@ public class NFConnector {
 	private Socket socket;
 	private InetSocketAddress serverAddr;
 
-
+	
 
 
 	public NFConnector(InetSocketAddress fserverAddr) throws UnknownHostException, IOException {
