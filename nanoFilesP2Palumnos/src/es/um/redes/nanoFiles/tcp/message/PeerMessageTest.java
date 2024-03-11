@@ -19,7 +19,10 @@ public class PeerMessageTest {
 		 * writeMessageToOutputStream para comprobar que readMessageFromInputStream
 		 * construye un mensaje idéntico al original.
 		 */
-		PeerMessage msgOut = new PeerMessage();
+		byte opcode = PeerMessageOps.operationToOpcode("DOWNLOAD_FROM");
+		int length = 2;
+		byte[] value = {9, 8};
+		PeerMessage msgOut = new PeerMessage(opcode, length, value);
 		msgOut.writeMessageToOutputStream(fos);
 
 		DataInputStream fis = new DataInputStream(new FileInputStream(nombreArchivo));
@@ -30,6 +33,12 @@ public class PeerMessageTest {
 		 */
 		if (msgOut.getOpcode() != msgIn.getOpcode()) {
 			System.err.println("Opcode does not match!");
+		}
+		if (msgOut.getLenght() != msgIn.getLenght()) {
+			System.err.println("Length does not match!");
+		}
+		if (msgOut.getValue() != msgIn.getValue()) {
+			System.err.println("Data does not match!");
 		}
 	}
 
