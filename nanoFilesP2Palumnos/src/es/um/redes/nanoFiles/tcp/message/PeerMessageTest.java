@@ -22,7 +22,7 @@ public class PeerMessageTest {
 		byte opcode = PeerMessageOps.operationToOpcode("DOWNLOAD_FROM");
 		int length = 2;
 		byte[] value = {9, 8};
-		PeerMessage msgOut = new PeerMessage(opcode, length, value);
+		PeerMessage msgOut = new PeerMessage(opcode);
 		msgOut.writeMessageToOutputStream(fos);
 
 		DataInputStream fis = new DataInputStream(new FileInputStream(nombreArchivo));

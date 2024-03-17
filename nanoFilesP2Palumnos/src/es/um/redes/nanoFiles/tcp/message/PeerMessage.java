@@ -13,10 +13,7 @@ import java.nio.ByteBuffer;
 import es.um.redes.nanoFiles.util.FileInfo;
 
 public class PeerMessage {
-	private static final char DELIMITER = ':'; // Define el delimitador
-	private static final char END_LINE = '\n'; // Define el carácter de fin de línea
-
-
+	
 
 	private byte opcode;
 	
@@ -32,14 +29,10 @@ public class PeerMessage {
 
 	public PeerMessage() {
 		opcode = PeerMessageOps.OPCODE_INVALID_CODE;
-		length = 0;
-		value = new byte[0];
 	}
 
-	public PeerMessage(byte op, int len, byte[] val) {
+	public PeerMessage(byte op) {
 		opcode = op;
-		length = len;
-		value = val;
 	}
 	
 	/*
@@ -127,7 +120,6 @@ public class PeerMessage {
 		case PeerMessageOps.OPCODE_DOWNLOAD_FROM: {
 			dos.writeInt(length);
 			dos.write(value);
-			System.out.println(PeerMessageOps.opcodeToOperation(opcode) + DELIMITER + " longitud: " + length + " datos: " + value + END_LINE);
 			break;
 		}
 
