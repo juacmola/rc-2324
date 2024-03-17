@@ -5,16 +5,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.LinkedList;
 import java.util.Random;
 
-
-
-
+import es.um.redes.nanoFiles.tcp.client.NFConnector;
+import es.um.redes.nanoFiles.tcp.server.NFServerSimple;
 
 public class NFControllerLogicP2P {
-	/*
-	 * TODO: Para bgserve, se necesita un atributo NFServer que actuará como
+	/* TODO: Para bgserve, se necesita un atributo NFServer que actuará como
 	 * servidor de ficheros en segundo plano de este peer
 	 */
 
@@ -26,18 +25,20 @@ public class NFControllerLogicP2P {
 
 	/**
 	 * Método para arrancar un servidor de ficheros en primer plano.
-	 * 
+	 * @throws IOException 
 	 */
-	protected void foregroundServeFiles() {
-		/*
-		 * TODO: Crear objeto servidor NFServerSimple y ejecutarlo en primer plano.
-		 */
-		/*
-		 * TODO: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
+	protected void foregroundServeFiles() throws IOException {
+		/* DONE: Crear objeto servidor NFServerSimple y ejecutarlo en primer plano.*/
+		try {
+			NFServerSimple server = new NFServerSimple();
+			server.run();
+		}
+		/* TODO: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
 		 * este método. Si se produce una excepción de entrada/salida (error del que no
-		 * es posible recuperarse), se debe informar sin abortar el programa
-		 */
-
+		 * es posible recuperarse), se debe informar sin abortar el programa*/
+		catch (IOException e){
+			System.err.println("Error starting server: " + e.getMessage());
+		}
 
 
 	}
@@ -75,28 +76,38 @@ public class NFControllerLogicP2P {
 	 * @param fserverAddr    La dirección del servidor al que se conectará
 	 * @param targetFileHash El hash del fichero a descargar
 	 * @param localFileName  El nombre con el que se guardará el fichero descargado
+	 * @throws IOException 
 	 */
 	protected boolean downloadFileFromSingleServer(InetSocketAddress fserverAddr, String targetFileHash,
-			String localFileName) {
+			String localFileName) throws IOException {
 		boolean result = false;
 		if (fserverAddr == null) {
 			System.err.println("* Cannot start download - No server address provided");
 			return false;
 		}
-		/*
-		 * TODO: Crear un objeto NFConnector para establecer la conexión con el peer
+		/* DONE: Crear un objeto NFConnector para establecer la conexión con el peer
 		 * servidor de ficheros, y usarlo para descargar el fichero mediante su método
 		 * "downloadFile". Se debe comprobar previamente si ya existe un fichero con el
 		 * mismo nombre en esta máquina, en cuyo caso se informa y no se realiza la
 		 * descarga. Si todo va bien, imprimir mensaje informando de que se ha
-		 * completado la descarga.
-		 */
-		/*
-		 * TODO: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
+		 * completado la descarga. */
+		File newlocalFileName = new File(localFileName);
+		try {
+			if (newlocalFileName.exists()) {
+				System.out.println("There is already a file with this name. Try a different one");
+			}
+			NFConnector connector = new NFConnector(fserverAddr);
+			result = connector.downloadFile(targetFileHash, newlocalFileName);
+			
+			if (result) System.out.println("File downloaded successfully");
+			else System.out.println("File could not be downloaded");
+		}
+		/* DONE: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
 		 * este método. Si se produce una excepción de entrada/salida (error del que no
-		 * es posible recuperarse), se debe informar sin abortar el programa
-		 */
-
+		 * es posible recuperarse), se debe informar sin abortar el programa*/
+		catch (IOException e) {
+			System.err.println("There was an error downloading the file: " + e.getMessage());
+		}
 
 
 		return result;
@@ -118,19 +129,16 @@ public class NFControllerLogicP2P {
 			System.err.println("* Cannot start download - No list of server addresses provided");
 			return false;
 		}
-		/*
-		 * TODO: Crear un objeto NFConnector para establecer la conexión con cada
+		/* TODO: Crear un objeto NFConnector para establecer la conexión con cada
 		 * servidor de ficheros, y usarlo para descargar un trozo (chunk) del fichero
 		 * mediante su método "downloadFileChunk". Se debe comprobar previamente si ya
 		 * existe un fichero con el mismo nombre en esta máquina, en cuyo caso se
 		 * informa y no se realiza la descarga. Si todo va bien, imprimir mensaje
-		 * informando de que se ha completado la descarga.
-		 */
-		/*
-		 * TODO: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
+		 * informando de que se ha completado la descarga.*/
+		
+		/* TODO: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
 		 * este método. Si se produce una excepción de entrada/salida (error del que no
-		 * es posible recuperarse), se debe informar sin abortar el programa
-		 */
+		 * es posible recuperarse), se debe informar sin abortar el programa*/
 
 
 

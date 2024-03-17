@@ -218,31 +218,27 @@ public class NFControllerLogicDir {
 	 *                                   preguntamos
 	 * @return La dirección de socket del peer identificado por dicho nick, o null
 	 *         si no se encuentra ningún peer con ese nick.
+	 * @throws IOException 
 	 */
-	public InetSocketAddress getServerAddress(String serverNicknameOrSocketAddr) {
+	public InetSocketAddress getServerAddress(String serverNicknameOrSocketAddr) throws IOException {
 		InetSocketAddress fserverAddr = null;
-		/*
-		 * TODO: Averiguar si el nickname es en realidad una cadena "IP:puerto", en cuyo
+		/* TODO: Averiguar si el nickname es en realidad una cadena "IP:puerto", en cuyo
 		 * caso no es necesario comunicarse con el directorio (simplemente se devuelve
 		 * un InetSocketAddress); en otro caso, utilizar el método
 		 * lookupServerAddrByUsername de esta clase para comunicarse con el directorio y
 		 * obtener la IP:puerto del servidor con dicho nickname. Devolver null si la
-		 * operación fracasa.
-		 */
+		 * operación fracasa. */
 		if (serverNicknameOrSocketAddr.contains(":")) { // Then it has to be a socket address (IP:port)
-			/*
-			 * TODO: Extraer la dirección IP y el puerto de la cadena y devolver un
+			/* DONE: Extraer la dirección IP y el puerto de la cadena y devolver un
 			 * InetSocketAddress. Para convertir un string con la IP a un objeto InetAddress
-			 * se debe usar InetAddress.getByName()
-			 */
-
-
-
+			 * se debe usar InetAddress.getByName()*/
+			int idx = serverNicknameOrSocketAddr.indexOf(":"); // Posición del delimitador
+			InetAddress serverIP = InetAddress.getByName(serverNicknameOrSocketAddr);
+			String serverPort = serverNicknameOrSocketAddr.substring(idx + 1).trim();
+			fserverAddr = new InetSocketAddress(serverIP, Integer.parseInt(serverPort));
 		} else {
-			/*
-			 * TODO: Si es un nickname, preguntar al directorio la IP:puerto asociada a
-			 * dicho peer servidor.
-			 */
+			/* TODO: Si es un nickname, preguntar al directorio la IP:puerto asociada a
+			 * dicho peer servidor. */
 			fserverAddr = lookupServerAddrByUsername(serverNicknameOrSocketAddr);
 		}
 		return fserverAddr;
