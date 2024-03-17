@@ -6,12 +6,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
 import es.um.redes.nanoFiles.tcp.message.PeerMessage;
 import es.um.redes.nanoFiles.tcp.message.PeerMessageOps;
+import es.um.redes.nanoFiles.udp.server.NFDirectoryServer;
 import es.um.redes.nanoFiles.util.FileDigest;
 
 //Esta clase proporciona la funcionalidad necesaria para intercambiar mensajes entre el cliente y el servidor
@@ -22,20 +25,19 @@ public class NFConnector {
 	
 
 
-	public NFConnector(InetSocketAddress fserverAddr) throws UnknownHostException, IOException {
+	public NFConnector(InetSocketAddress fserverAddr) throws IOException {
 		serverAddr = fserverAddr;
-		/*
-		 * TODO Se crea el socket a partir de la dirección del servidor (IP, puerto). La
+		/* DONE: Se crea el socket a partir de la dirección del servidor (IP, puerto). La
 		 * creación exitosa del socket significa que la conexión TCP ha sido
-		 * establecida.
-		 */
-		/*
-		 * TODO Se crean los DataInputStream/DataOutputStream a partir de los streams de
+		 * establecida.*/
+		this.socket = new Socket(fserverAddr.getAddress(), fserverAddr.getPort());
+		
+		/* DONE: Se crean los DataInputStream/DataOutputStream a partir de los streams de
 		 * entrada/salida del socket creado. Se usarán para enviar (dos) y recibir (dis)
-		 * datos del servidor.
-		 */
-
-
+		 * datos del servidor.*/
+		
+		DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+		DataInputStream dis = new DataInputStream(socket.getInputStream());
 
 	}
 
