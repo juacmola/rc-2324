@@ -1,6 +1,7 @@
 package es.um.redes.nanoFiles.tcp.server;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -16,12 +17,11 @@ public class NFServer implements Runnable {
 	private static final int SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS = 1000;
 
 	public NFServer() throws IOException {
-		/*
-		 * TODO: Crear un socket servidor y ligarlo a cualquier puerto disponible
-		 */
-
-
-
+		/* TODO: Crear un socket servidor y ligarlo a cualquier puerto disponible*/
+		serverSocket = new ServerSocket();
+//		serverSocket.setSoTimeout(SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS);	No descomentarlo hasta probar que funciona
+		InetSocketAddress serverSocketAddress = new InetSocketAddress(5000);
+		serverSocket.bind(serverSocketAddress);
 	}
 
 	/**
@@ -31,23 +31,19 @@ public class NFServer implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
-		/*
-		 * TODO: Usar el socket servidor para esperar conexiones de otros peers que
-		 * soliciten descargar ficheros
-		 */
-		/*
-		 * TODO: Al establecerse la conexión con un peer, la comunicación con dicho
+		/* TODO: Usar el socket servidor para esperar conexiones de otros peers que
+		 * soliciten descargar ficheros*/
+		
+		/* TODO: Al establecerse la conexión con un peer, la comunicación con dicho
 		 * cliente se hace en el método NFServerComm.serveFilesToClient(socket), al cual
-		 * hay que pasarle el socket devuelto por accept
-		 */
-		/*
-		 * TODO: (Opcional) Crear un hilo nuevo de la clase NFServerThread, que llevará
+		 * hay que pasarle el socket devuelto por accept*/
+		
+		/* TODO: (Opcional) Crear un hilo nuevo de la clase NFServerThread, que llevará
 		 * a cabo la comunicación con el cliente que se acaba de conectar, mientras este
 		 * hilo vuelve a quedar a la escucha de conexiones de nuevos clientes (para
 		 * soportar múltiples clientes). Si este hilo es el que se encarga de atender al
 		 * cliente conectado, no podremos tener más de un cliente conectado a este
-		 * servidor.
-		 */
+		 * servidor.*/
 
 
 
