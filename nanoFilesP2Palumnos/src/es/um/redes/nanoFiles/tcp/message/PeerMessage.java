@@ -98,6 +98,12 @@ public class PeerMessage {
 			break;
 		}
 		
+		case PeerMessageOps.OPCODE_INVALID_CODE:
+		case PeerMessageOps.OPCODE_FILE_NOT_FOUND: 
+		case PeerMessageOps.OPCODE_INCORRECT_HASH: {
+			
+		}
+		
 		
 		default:
 			System.err.println("PeerMessage.readMessageFromInputStream doesn't know how to parse this message opcode: "
@@ -118,15 +124,18 @@ public class PeerMessage {
 		dos.writeByte(opcode);
 		switch (opcode) {
 		case PeerMessageOps.OPCODE_DOWNLOAD_FROM: {
-			dos.writeInt(length);
-			dos.write(value);
+			//dos.write
+			//dos.write
 			break;
 		}
 
 		case PeerMessageOps.OPCODE_DOWNLOAD_OK: {
+			//dos.write
+			//dos.write
 			break;
 		}
-
+		
+		case PeerMessageOps.OPCODE_INVALID_CODE:
 		case PeerMessageOps.OPCODE_FILE_NOT_FOUND:
 		case PeerMessageOps.OPCODE_INCORRECT_HASH: {
 			break;
