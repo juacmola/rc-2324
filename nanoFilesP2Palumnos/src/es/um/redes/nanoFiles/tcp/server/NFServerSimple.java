@@ -20,7 +20,9 @@ public class NFServerSimple {
 		InetSocketAddress serverSocketAddress = new InetSocketAddress(PORT);
 		/* DONE: Crear un socket servidor y ligarlo a la dirección de socket anterior */
 		serverSocket = new ServerSocket();
+		serverSocket.setSoTimeout(SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS);
 		serverSocket.bind(serverSocketAddress);
+		serverSocket.setReuseAddress(true);
 		System.out.println("\nServer is listening on port " + PORT);
 	}
 
@@ -32,6 +34,10 @@ public class NFServerSimple {
 	 * @throws IOException 
 	 */
 	public void run() throws IOException {
+		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+		boolean shutDownServer = false;
+		Socket socket = null;
+		
 		/* DONE: Comprobar que el socket servidor está creado y ligado */
 		if (serverSocket != null && serverSocket.isBound()) {
 			System.out.println("Server socket is running on " + serverSocket.getLocalSocketAddress());
@@ -42,10 +48,6 @@ public class NFServerSimple {
 		}
 		/* DONE: Usar el socket servidor para esperar conexiones de otros peers que
 		 * soliciten descargar ficheros */
-		BufferedReader Input = new BufferedReader(new InputStreamReader(System.in));
-		boolean shutDownServer = false;
-		Socket socket = null;
-//		serverSocket.setSoTimeout(SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS);
 		
 		while (!shutDownServer) {
 			try {
@@ -53,21 +55,20 @@ public class NFServerSimple {
 				System.out.println("\nNew client connected: " +
 						socket.getInetAddress().toString() + ":" + socket.getPort());
 			} catch (SocketTimeoutException e) {
-				if(Input.ready() && Input.readLine().equals(STOP_SERVER_COMMAND)) {
+				if(input.ready() && input.readLine().equals(STOP_SERVER_COMMAND)) {
 					shutDownServer = true;
+					continue;
 				}
-				e.printStackTrace();
 			} catch (IOException e) {
 				System.err.println("There was a problem");
 				e.printStackTrace();
 			} 
-		}
 		/* DONE: Al establecerse la conexión con un peer, la comunicación con dicho
 		 * cliente se hace en el método NFServerComm.serveFilesToClient(socket), al cual
 		 * hay que pasarle el socket devuelto por accept */
-		if (socket.isConnected()) NFServerComm.serveFilesToClient(socket);
-
-
+			if (socket != null && socket.isConnected()) NFServerComm.serveFilesToClient(socket);
+		}
+		
 		System.out.println("NFServerSimple stopped. Returning to the nanoFiles shell...");
 	}
 }
