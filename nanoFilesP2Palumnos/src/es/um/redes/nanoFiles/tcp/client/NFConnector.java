@@ -21,8 +21,8 @@ import es.um.redes.nanoFiles.util.FileDigest;
 public class NFConnector {
 	private Socket socket;
 	private InetSocketAddress serverAddr;
-
-	
+	private DataOutputStream dos;
+	private DataInputStream dis;
 
 
 	public NFConnector(InetSocketAddress fserverAddr) throws IOException {
@@ -36,8 +36,8 @@ public class NFConnector {
 		 * entrada/salida del socket creado. Se usarán para enviar (dos) y recibir (dis)
 		 * datos del servidor.*/
 		
-		DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-		DataInputStream dis = new DataInputStream(socket.getInputStream());
+		dos = new DataOutputStream(socket.getOutputStream());
+		dis = new DataInputStream(socket.getInputStream());
 
 	}
 
@@ -89,9 +89,15 @@ public class NFConnector {
 		 * subcadena del mismo como parámetro.
 		 */
 
+		
+		dos.writeInt(5);
+		int dataFromClient = dis.readInt();
+		
+		if (dataFromClient==5) System.out.println("******MATCH******");
+		else System.out.println("------NOT MATCH-------");
 
-
-
+		downloaded = true;
+		
 		return downloaded;
 	}
 
