@@ -233,7 +233,10 @@ public class NFControllerLogicDir {
 			 * InetSocketAddress. Para convertir un string con la IP a un objeto InetAddress
 			 * se debe usar InetAddress.getByName()*/
 			int idx = serverNicknameOrSocketAddr.indexOf(":"); // Posición del delimitador
-			InetAddress serverIP = InetAddress.getByName(serverNicknameOrSocketAddr);
+			
+			String address = serverNicknameOrSocketAddr.substring(0, idx);
+			InetAddress serverIP = InetAddress.getByName(address);
+			
 			String serverPort = serverNicknameOrSocketAddr.substring(idx + 1).trim();
 			fserverAddr = new InetSocketAddress(serverIP, Integer.parseInt(serverPort));
 		} else {
