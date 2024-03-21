@@ -25,7 +25,7 @@ public class NFServerComm {
 		/* TODO: Mientras el cliente esté conectado, leer mensajes de socket,
 		 * convertirlo a un objeto PeerMessage y luego actuar en función del tipo de
 		 * mensaje recibido, enviando los correspondientes mensajes de respuesta.*/
-		while (socket.isConnected()) {
+		if (socket.isConnected()) {
 			int dataFromClient = dis.readInt();
 			dos.writeInt(dataFromClient);
 		}
