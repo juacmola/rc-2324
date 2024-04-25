@@ -84,28 +84,29 @@ public class PeerMessage {
 		PeerMessage message = new PeerMessage();
 		byte opcode = dis.readByte();
 		message.setOpcode(opcode);
+		
 		switch (opcode) {
-		case PeerMessageOps.OPCODE_DOWNLOAD_FROM: {
-			int longitudDatos = dis.readInt();
-			byte[] datos = new byte[longitudDatos];
-			dis.readFully(datos);
-			message.setLenght(longitudDatos);
-			message.setValue(datos);
-			break;
-		}
+			case PeerMessageOps.OPCODE_DOWNLOAD_FROM: {
+				int longitudDatos = dis.readInt();
+				byte[] datos = new byte[longitudDatos];
+				dis.readFully(datos);
+				message.setLenght(longitudDatos);
+				message.setValue(datos);
+				break;
+			}
 
-		case PeerMessageOps.OPCODE_DOWNLOAD_OK: {
-			break;
-		}
+			case PeerMessageOps.OPCODE_DOWNLOAD_OK: {
+				break;
+			}
 		
-		case PeerMessageOps.OPCODE_INVALID_CODE:
-		case PeerMessageOps.OPCODE_FILE_NOT_FOUND: 
-		case PeerMessageOps.OPCODE_INCORRECT_HASH: {
+			case PeerMessageOps.OPCODE_INVALID_CODE:
+			case PeerMessageOps.OPCODE_FILE_NOT_FOUND: 
+			case PeerMessageOps.OPCODE_INCORRECT_HASH: {
 			
-		}
+			}
 		
 		
-		default:
+			default:
 			System.err.println("PeerMessage.readMessageFromInputStream doesn't know how to parse this message opcode: "
 					+ PeerMessageOps.opcodeToOperation(opcode));
 			System.exit(-1);

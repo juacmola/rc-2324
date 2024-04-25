@@ -1,14 +1,10 @@
 package es.um.redes.nanoFiles.udp.message;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import es.um.redes.nanoFiles.util.FileInfo;
 
 /**
  * Clase que modela los mensajes del protocolo de comunicación entre pares para
