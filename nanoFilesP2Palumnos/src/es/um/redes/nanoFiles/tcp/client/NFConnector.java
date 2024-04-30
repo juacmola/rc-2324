@@ -24,7 +24,6 @@ public class NFConnector {
 	private DataOutputStream dos;
 	private DataInputStream dis;
 
-
 	public NFConnector(InetSocketAddress fserverAddr) throws IOException {
 		serverAddr = fserverAddr;
 		/* DONE: Se crea el socket a partir de la dirección del servidor (IP, puerto). La
@@ -90,14 +89,49 @@ public class NFConnector {
 		 */
 
 		
-		dos.writeInt(5);
-		int dataFromClient = dis.readInt();
+//		dos.writeInt(5);						// PRUEBA
+//		int dataFromClient = dis.readInt();
 		
-		if (dataFromClient==5) System.out.println("******MATCH******");
-		else System.out.println("------NOT MATCH-------");
+//		if (dataFromClient==5) System.out.println("******MATCH******");
+//		else System.out.println("------NOT MATCH-------");
 
-		downloaded = true;
+		byte opcode = PeerMessageOps.operationToOpcode("DOWNLOAD_FROM");
+		PeerMessage msgOut = new PeerMessage(opcode);
+		msgOut.setHash(targetFileHashSubstr);
+		msgOut.writeMessageToOutputStream(dos);
 		
+		PeerMessage msgIn = PeerMessage.readMessageFromInputStream(dis);
+		switch (msgIn.getOpcode()) {
+		case PeerMessageOps.OPCODE_DOWNLOAD_OK:
+			try (FileOutputStream fos = new FileOutputStream(file)) {
+//				fos.write(msgIn.getData());		//Tenemos que solucionar la manera de enviar los datos
+			}
+			// TODO: Compare the integrity of the downloaded file with the original file
+			if (msgOut.getOpcode() != msgIn.getOpcode()) {
+				System.err.println("Opcode does not match!");
+			}
+			if (msgOut.getLength() != msgIn.getLength()) {
+				System.err.println("Length does not match!");
+			}
+			if (msgOut.getHash() != msgIn.getHash()) {
+				System.err.println("Hash does not match!");
+			}
+			downloaded = true;
+			break;
+		case PeerMessageOps.OPCODE_FILE_NOT_FOUND:
+			// File not found on the server
+			System.err.println("Requested file not found on the server.");
+			String hashError = msgIn.getHash();
+			System.out.println(hashError);
+			break;
+		case PeerMessageOps.OPCODE_INVALID_CODE:
+			System.out.println("Write a valid operation");
+		default:
+			// Unexpected response from the server
+			System.err.println("Unexpected response from the server.");
+			break;
+		}
+
 		return downloaded;
 	}
 

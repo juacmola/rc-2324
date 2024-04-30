@@ -34,11 +34,11 @@ public class PeerMessageTest {
 		if (msgOut.getOpcode() != msgIn.getOpcode()) {
 			System.err.println("Opcode does not match!");
 		}
-		if (msgOut.getLenght() != msgIn.getLenght()) {
+		if (msgOut.getLength() != msgIn.getLength()) {
 			System.err.println("Length does not match!");
 		}
-		if (msgOut.getValue() != msgIn.getValue()) {
-			System.err.println("Data does not match!");
+		if (msgOut.getHash() != msgIn.getHash()) {
+			System.err.println("Hash does not match!");
 		}
 	}
 

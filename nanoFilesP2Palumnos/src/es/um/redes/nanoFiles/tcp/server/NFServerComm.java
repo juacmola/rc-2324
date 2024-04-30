@@ -6,6 +6,7 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.Socket;
@@ -21,13 +22,37 @@ public class NFServerComm {
 		/* DONE: Crear dis/dos a partir del socket */
 		DataInputStream dis = new DataInputStream(socket.getInputStream());
 		DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+		PeerMessage readMessage;
+		PeerMessage writeMessage;
+		String path = "";
 		
 		/* TODO: Mientras el cliente esté conectado, leer mensajes de socket,
 		 * convertirlo a un objeto PeerMessage y luego actuar en función del tipo de
 		 * mensaje recibido, enviando los correspondientes mensajes de respuesta.*/
-		if (socket.isConnected()) {
-			int dataFromClient = dis.readInt();
-			dos.writeInt(dataFromClient);
+//		if(socket.isConnected()) {
+//			int dataFromClient = dis.readInt();				// Pruebas<
+//		dos.writeInt(dataFromClient);
+//		}
+		
+		while (socket.isConnected()) {
+			readMessage = PeerMessage.readMessageFromInputStream(dis);
+			
+			switch(readMessage.getOpcode()) {
+				case PeerMessageOps.OPCODE_DOWNLOAD_FROM: {
+					FileInfo[] files = NanoFiles.db.getFiles();
+					for (FileInfo file : files) {
+						if (file.fileHash.equals(readMessage.getHash())) path = file.filePath;		//Si coinciden -> Nos quedamos su ruta 
+					}
+//					File f = new File("file.tgz");
+//					if (!f.exists()) {
+//						f.createNewFile();
+//						FileOutputStream fos = new FileOutputStream(f);
+//						fos.write(fichero);
+//						fos.close();
+//					}
+				}
+				
+			}
 		}
 		/* TODO: Para servir un fichero, hay que localizarlo a partir de su hash (o
 		 * subcadena) en nuestra base de datos de ficheros compartidos. Los ficheros

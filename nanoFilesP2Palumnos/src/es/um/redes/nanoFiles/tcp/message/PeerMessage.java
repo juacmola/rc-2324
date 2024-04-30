@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -22,14 +24,13 @@ public class PeerMessage {
 	 * mensajes con otros campos (tipos de datos)
 	 * 
 	 */
+	private String hash;
 	private int length;
-	private byte[] value;
+	private FileInfo fileInfo;
+	private byte[] fichero;
 
 
-
-	public PeerMessage() {
-		opcode = PeerMessageOps.OPCODE_INVALID_CODE;
-	}
+	public PeerMessage() {}
 
 	public PeerMessage(byte op) {
 		opcode = op;
@@ -40,29 +41,12 @@ public class PeerMessage {
 	 * comprobando previamente que dichos atributos han sido establecidos por el
 	 * constructor (sanity checks)
 	 */
-	public byte getOpcode() {
-		return opcode;
-	}
-	
-	public int getLenght() {
-		return length;
-	}
-
-	public byte[] getValue() {
-		return value;
-	}
-	
-	public void setOpcode(byte op) {
-		opcode = op;
-	}
-	
-	public void setLenght(int len) {
-		length = len;
-	}
-
-	public void setValue(byte[] val) {
-		value = val;
-	}
+	public byte getOpcode() { return opcode;	}
+	public String getHash() { return hash;	}
+	public int getLength() { return length; }
+	public void setOpcode(byte op) { opcode = op;	}
+	public void setHash(String val) { hash = val; }
+	public void setLength(int len) { length = len;	}
 
 	/**
 	 * Método de clase para parsear los campos de un mensaje y construir el objeto
@@ -86,23 +70,29 @@ public class PeerMessage {
 		message.setOpcode(opcode);
 		
 		switch (opcode) {
-			case PeerMessageOps.OPCODE_DOWNLOAD_FROM: {
-				int longitudDatos = dis.readInt();
-				byte[] datos = new byte[longitudDatos];
-				dis.readFully(datos);
-				message.setLenght(longitudDatos);
-				message.setValue(datos);
+			case PeerMessageOps.OPCODE_DOWNLOAD_FROM: { //Nos quedamos con la cadena hash
+				int len=dis.readInt();
+				byte[] data=new byte[len];
+				dis.readFully(data);
+				String str=new String(data,"UTF-8");
+				message.setHash(str);
 				break;
 			}
 
 			case PeerMessageOps.OPCODE_DOWNLOAD_OK: {
-				break;
+				
+				
+				
+        break;
 			}
 		
-			case PeerMessageOps.OPCODE_INVALID_CODE:
-			case PeerMessageOps.OPCODE_FILE_NOT_FOUND: 
-			case PeerMessageOps.OPCODE_INCORRECT_HASH: {
-			
+			case PeerMessageOps.OPCODE_FILE_NOT_FOUND: { //Nos quedamos con la cadena hash
+				int len=dis.readInt();
+				byte[] data=new byte[len];
+				dis.readFully(data);
+				String str=new String(data,"UTF-8");
+				message.setHash(str);
+				break;
 			}
 		
 		
@@ -125,20 +115,21 @@ public class PeerMessage {
 		dos.writeByte(opcode);
 		switch (opcode) {
 		case PeerMessageOps.OPCODE_DOWNLOAD_FROM: {
-			//dos.write
-			//dos.write
+			byte[] data=hash.getBytes("UTF-8");
+//			dos.writeInt(data.length);
+			dos.write(data);
 			break;
 		}
 
 		case PeerMessageOps.OPCODE_DOWNLOAD_OK: {
-			//dos.write
-			//dos.write
+			
 			break;
 		}
 		
-		case PeerMessageOps.OPCODE_INVALID_CODE:
-		case PeerMessageOps.OPCODE_FILE_NOT_FOUND:
-		case PeerMessageOps.OPCODE_INCORRECT_HASH: {
+		case PeerMessageOps.OPCODE_FILE_NOT_FOUND: {
+			byte[] data=hash.getBytes("UTF-8");
+			dos.writeInt(data.length);
+			dos.write(data);
 			break;
 		}
 		

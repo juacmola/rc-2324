@@ -9,7 +9,6 @@ public class PeerMessageOps {
 	public static final byte OPCODE_DOWNLOAD_FROM = 1;
 	public static final byte OPCODE_DOWNLOAD_OK = 2;
 	public static final byte OPCODE_FILE_NOT_FOUND = 3;
-	public static final byte OPCODE_INCORRECT_HASH = 4;
 	
 
 	/**
@@ -22,7 +21,6 @@ public class PeerMessageOps {
 			OPCODE_DOWNLOAD_FROM,
 			OPCODE_DOWNLOAD_OK,
 			OPCODE_FILE_NOT_FOUND,
-			OPCODE_INCORRECT_HASH
 			
 			};
 	private static final String[] _valid_operations_str = {
@@ -30,7 +28,6 @@ public class PeerMessageOps {
 			"DOWNLOAD_FROM",
 			"DOWNLOAD_OK",
 			"FILE_NOT_FOUND",
-			"INCORRECT_HASH"
 			
 			};
 
@@ -48,7 +45,7 @@ public class PeerMessageOps {
 	/**
 	 * Transforma una cadena en el opcode correspondiente
 	 */
-	protected static byte operationToOpcode(String opStr) {
+	public static byte operationToOpcode(String opStr) {
 		return _operation_to_opcode.getOrDefault(opStr.toLowerCase(), OPCODE_INVALID_CODE);
 	}
 
