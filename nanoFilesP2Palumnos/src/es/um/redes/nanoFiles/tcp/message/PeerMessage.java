@@ -27,7 +27,7 @@ public class PeerMessage {
 	private String hash;
 	private int length;
 	private FileInfo fileInfo;
-	private byte[] fichero;
+	private byte[] file;
 
 
 	public PeerMessage() {}
@@ -44,9 +44,11 @@ public class PeerMessage {
 	public byte getOpcode() { return opcode;	}
 	public String getHash() { return hash;	}
 	public int getLength() { return length; }
-	public void setOpcode(byte op) { opcode = op;	}
-	public void setHash(String val) { hash = val; }
-	public void setLength(int len) { length = len;	}
+	public byte[] getFile() { return file; }
+	public void setOpcode(byte op) { this.opcode = op;	}
+	public void setHash(String val) { this.hash = val; }
+	public void setLength(int len) { this.length = len;	}
+	public void setFile(byte[] f) { this.file = f; }
 
 	/**
 	 * Método de clase para parsear los campos de un mensaje y construir el objeto
@@ -80,9 +82,15 @@ public class PeerMessage {
 			}
 
 			case PeerMessageOps.OPCODE_DOWNLOAD_OK: {
-				
-				
-				
+				int lenFile=dis.readInt();
+				int lenHash=dis.readInt();
+				byte[] dataHash=new byte[lenHash];
+				dis.readFully(dataHash);
+				String strHash=new String(dataHash,"UTF-8");
+				byte[] dataFile=new byte[lenFile];
+				message.setLength(lenFile);
+				message.setHash(strHash);
+				message.setFile(dataFile);
         break;
 			}
 		
@@ -116,13 +124,17 @@ public class PeerMessage {
 		switch (opcode) {
 		case PeerMessageOps.OPCODE_DOWNLOAD_FROM: {
 			byte[] data=hash.getBytes("UTF-8");
-//			dos.writeInt(data.length);
+			dos.writeInt(data.length);
 			dos.write(data);
 			break;
 		}
 
 		case PeerMessageOps.OPCODE_DOWNLOAD_OK: {
-			
+			dos.writeInt(length);				//La longitud del fichero
+			byte[] data=hash.getBytes("UTF-8");
+			dos.writeInt(data.length);
+			dos.write(data);
+			dos.write(file);
 			break;
 		}
 		
