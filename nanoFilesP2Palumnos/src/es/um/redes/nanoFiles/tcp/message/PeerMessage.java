@@ -25,7 +25,7 @@ public class PeerMessage {
 	 * 
 	 */
 	private String hash;
-	private int length;
+	private long length;
 	private FileInfo fileInfo;
 	private byte[] file;
 
@@ -43,11 +43,11 @@ public class PeerMessage {
 	 */
 	public byte getOpcode() { return opcode;	}
 	public String getHash() { return hash;	}
-	public int getLength() { return length; }
+	public long getLength() { return length; }
 	public byte[] getFile() { return file; }
 	public void setOpcode(byte op) { this.opcode = op;	}
 	public void setHash(String val) { this.hash = val; }
-	public void setLength(int len) { this.length = len;	}
+	public void setLength(long len) { this.length = len;	}
 	public void setFile(byte[] f) { this.file = f; }
 
 	/**
@@ -113,8 +113,7 @@ public class PeerMessage {
 	}
 
 	public void writeMessageToOutputStream(DataOutputStream dos) throws IOException {
-		/*
-		 * TODO: Escribir los bytes en los que se codifica el mensaje en el socket a
+		/*TODO: Escribir los bytes en los que se codifica el mensaje en el socket a
 		 * través del "dos", teniendo en cuenta opcode del mensaje del que se trata y
 		 * los campos relevantes en cada caso. NOTA: Usar dos.write para escribir un array
 		 * de bytes, dos.writeInt para escribir un entero, etc.
@@ -124,15 +123,15 @@ public class PeerMessage {
 		switch (opcode) {
 		case PeerMessageOps.OPCODE_DOWNLOAD_FROM: {
 			byte[] data=hash.getBytes("UTF-8");
-			dos.writeInt(data.length);
+			dos.writeLong(data.length);
 			dos.write(data);
 			break;
 		}
 
 		case PeerMessageOps.OPCODE_DOWNLOAD_OK: {
-			dos.writeInt(length);				//La longitud del fichero
+			dos.writeLong(length);				//La longitud del fichero
 			byte[] data=hash.getBytes("UTF-8");
-			dos.writeInt(data.length);
+			dos.writeLong(data.length);
 			dos.write(data);
 			dos.write(file);
 			break;
@@ -140,7 +139,7 @@ public class PeerMessage {
 		
 		case PeerMessageOps.OPCODE_FILE_NOT_FOUND: {
 			byte[] data=hash.getBytes("UTF-8");
-			dos.writeInt(data.length);
+			dos.writeLong(data.length);
 			dos.write(data);
 			break;
 		}

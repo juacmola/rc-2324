@@ -6,6 +6,7 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -25,43 +26,67 @@ public class NFServerComm {
 		PeerMessage readMessage;
 		PeerMessage writeMessage;
 		String path = "";
+		String nombreArchivo = "peermsg.bin";
+		String targethash = "";
+		DataOutputStream fos = new DataOutputStream(new FileOutputStream(nombreArchivo));
 		
 		/* TODO: Mientras el cliente esté conectado, leer mensajes de socket,
 		 * convertirlo a un objeto PeerMessage y luego actuar en función del tipo de
 		 * mensaje recibido, enviando los correspondientes mensajes de respuesta.*/
-//		if(socket.isConnected()) {
-//			int dataFromClient = dis.readInt();				// Pruebas<
-//		dos.writeInt(dataFromClient);
-//		}
-		
 		while (socket.isConnected()) {
 			readMessage = PeerMessage.readMessageFromInputStream(dis);
 			
 			switch(readMessage.getOpcode()) {
 				case PeerMessageOps.OPCODE_DOWNLOAD_FROM: {
+					/* TODO: Para servir un fichero, hay que localizarlo a partir de su hash (o
+					 * subcadena) en nuestra base de datos de ficheros compartidos. Los ficheros
+					 * compartidos se pueden obtener con NanoFiles.db.getFiles(). El método
+					 * FileInfo.lookupHashSubstring es útil para buscar coincidencias de una
+					 * subcadena del hash. El método NanoFiles.db.lookupFilePath(targethash)
+					 * devuelve la ruta al fichero a partir de su hash completo. */
 					FileInfo[] files = NanoFiles.db.getFiles();
 					for (FileInfo file : files) {
-						if (file.fileHash.equals(readMessage.getHash())) path = file.filePath;		//Si coinciden -> Nos quedamos su ruta 
+						targethash = readMessage.getHash();
+						//TODO:Mirar lo del trozo de hash 
+						if (file.fileHash.equals(targethash)) {
+							path = NanoFiles.db.lookupFilePath(targethash);		//Si coinciden -> Nos quedamos su ruta 
+						}
 					}
-//					File f = new File("file.tgz");
-//					if (!f.exists()) {
-//						f.createNewFile();
-//						FileOutputStream fos = new FileOutputStream(f);
-//						fos.write(fichero);
-//						fos.close();
-//					}
+					try {
+						File f = new File(path);
+						DataInputStream fis = new DataInputStream(new FileInputStream(f));
+						long filelength = f.length();
+						byte data[] = new byte[(int) filelength];
+						fis.readFully(data);
+						
+						writeMessage = new PeerMessage(PeerMessageOps.OPCODE_DOWNLOAD_OK);
+						writeMessage.setLength(filelength);
+						writeMessage.setHash(targethash);
+						writeMessage.setFile(data);
+						writeMessage.writeMessageToOutputStream(dos);
+						
+						fis.close();
+						System.out.println("The download of the file was successful");
+						
+					}catch (FileNotFoundException e) {
+						writeMessage = new PeerMessage(PeerMessageOps.OPCODE_FILE_NOT_FOUND);
+						writeMessage.setHash(targethash);
+						writeMessage.writeMessageToOutputStream(dos);
+						System.err.println("Server could not find the file");
+			      e.printStackTrace();
+					}
+					catch (IOException e) {
+			      e.printStackTrace();
+					}
 				}
 				
 			}
 		}
-		/* TODO: Para servir un fichero, hay que localizarlo a partir de su hash (o
-		 * subcadena) en nuestra base de datos de ficheros compartidos. Los ficheros
-		 * compartidos se pueden obtener con NanoFiles.db.getFiles(). El método
-		 * FileInfo.lookupHashSubstring es útil para buscar coincidencias de una
-		 * subcadena del hash. El método NanoFiles.db.lookupFilePath(targethash)
-		 * devuelve la ruta al fichero a partir de su hash completo. */
 
-
+	//	if(socket.isConnected()) {
+	//	int dataFromClient = dis.readInt();				// Pruebas<
+	//	dos.writeInt(dataFromClient);
+	//}
 
 	}
 
