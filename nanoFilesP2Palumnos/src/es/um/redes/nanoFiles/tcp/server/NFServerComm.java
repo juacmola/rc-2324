@@ -44,23 +44,30 @@ public class NFServerComm {
 					 * FileInfo.lookupHashSubstring es útil para buscar coincidencias de una
 					 * subcadena del hash. El método NanoFiles.db.lookupFilePath(targethash)
 					 * devuelve la ruta al fichero a partir de su hash completo. */
+					targethash = readMessage.getHash();
+					
 					FileInfo[] files = NanoFiles.db.getFiles();
-					for (FileInfo file : files) {
-						targethash = readMessage.getHash();
-						//TODO:Mirar lo del trozo de hash 
-						if (file.fileHash.equals(targethash)) {
-							path = NanoFiles.db.lookupFilePath(targethash);		//Si coinciden -> Nos quedamos su ruta 
-						}
+					FileInfo[] filesMiniHash = FileInfo.lookupHashSubstring(files, targethash);
+					
+					int numFiles=0;
+					for (FileInfo file : filesMiniHash) {
+						path = NanoFiles.db.lookupFilePath(file.fileHash);
+						numFiles++;
 					}
+					if (numFiles>1) {
+						writeMessage = new PeerMessage(PeerMessageOps.OPCODE_AMBIGUOUS_HASH);
+						System.err.println("Client sent ambiguous hash");
+					}
+					
 					try {
 						File f = new File(path);
 						DataInputStream fis = new DataInputStream(new FileInputStream(f)); //TODO: Server could not find the file
-						int filelength = (int) f.length();
-						byte data[] = new byte[(int) filelength];
+						int fileLength = (int) f.length();
+						byte data[] = new byte[(int) fileLength];
 						fis.readFully(data);
 						
 						writeMessage = new PeerMessage(PeerMessageOps.OPCODE_DOWNLOAD_OK);
-						writeMessage.setLength(filelength);
+						writeMessage.setLength(fileLength);
 						writeMessage.setHash(targethash);
 						writeMessage.setFile(data);
 						writeMessage.writeMessageToOutputStream(dos);

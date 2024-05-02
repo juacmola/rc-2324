@@ -94,14 +94,15 @@ public class NFControllerLogicP2P {
 		File newlocalFileName = new File(localFileName);
 		try {
 			if (newlocalFileName.exists()) {
-				System.out.println("There is already a file with this name. Try a different one");
+				System.err.println("There is already a file with this name. Try a different one");
+				return result;
 			}
 			NFConnector connector = new NFConnector(fserverAddr);
 			result = connector.downloadFile(targetFileHash, newlocalFileName);
 			
 			if (result) System.out.println("File downloaded successfully");
 			else System.out.println("File could not be downloaded");
-		}
+		}catch (FileAlreadyExistsException e) {}
 		/* DONE: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
 		 * este método. Si se produce una excepción de entrada/salida (error del que no
 		 * es posible recuperarse), se debe informar sin abortar el programa*/

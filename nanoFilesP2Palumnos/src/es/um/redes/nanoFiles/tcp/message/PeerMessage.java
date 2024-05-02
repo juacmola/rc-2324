@@ -133,6 +133,10 @@ public class PeerMessage {
 			break;
 		}
 
+		case PeerMessageOps.OPCODE_AMBIGUOUS_HASH:{
+			break;
+		}
+		
 		case PeerMessageOps.OPCODE_DOWNLOAD_OK: {
 			dos.writeInt(length);				//La longitud del fichero
 			byte[] data=hash.getBytes("UTF-8");

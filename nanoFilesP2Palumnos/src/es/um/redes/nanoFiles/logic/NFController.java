@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import es.um.redes.nanoFiles.application.NanoFiles;
 import es.um.redes.nanoFiles.shell.NFCommands;
 import es.um.redes.nanoFiles.shell.NFShell;
+import es.um.redes.nanoFiles.tcp.server.NFServerSimple;
 import es.um.redes.nanoFiles.util.FileInfo;
 
 public class NFController {
@@ -16,6 +17,7 @@ public class NFController {
 	 */
 	private static final byte LOGGED_OUT = 0;
 	private static final byte LOGGED_IN = 1;
+	private static final byte SERVER = 1;
 	/*
 	 * TODO: Añadir más constantes que representen los estados del autómata del
 	 * cliente de directorio.
@@ -257,6 +259,13 @@ public class NFController {
 				}
 				break;
 			}
+			
+			case NFCommands.COM_FGSERVE:{
+				if (currentState != LOGGED_IN) {
+					commandAllowed = false;
+					System.err.println("*You cannot run this command because you are not logged into the directory");
+				}
+			}
 
 		default:
 			// System.err.println("ERROR: undefined behaviour for " + currentCommand + "
@@ -285,7 +294,15 @@ public class NFController {
 				break;
 			}
 		
-
+//			case NFCommands.COM_FGSERVE:{
+//				currentState = SERVER;
+//				break;
+//			}	
+//			
+//			case NFServerSimple.STOP_SERVER_COMMAND:{
+//				
+//			}
+			
 		default:
 		}
 

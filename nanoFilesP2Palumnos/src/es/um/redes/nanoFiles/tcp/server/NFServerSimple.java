@@ -11,19 +11,37 @@ import java.net.SocketTimeoutException;
 public class NFServerSimple {
 
 	private static final int SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS = 1000;
-	private static final String STOP_SERVER_COMMAND = "fgstop";
+	public static final String STOP_SERVER_COMMAND = "fgstop";
+	private static final int MAX_PORT_ATTEMPTS = 10; // Number of attempts to find an available port
 	private static final int PORT = 10000;
 	private ServerSocket serverSocket = null;
 
 	public NFServerSimple() throws IOException {
-		/* DONE: Crear una direción de socket a partir del puerto especificado */
-		InetSocketAddress serverSocketAddress = new InetSocketAddress(PORT);
-		/* DONE: Crear un socket servidor y ligarlo a la dirección de socket anterior */
-		serverSocket = new ServerSocket();
-		serverSocket.setSoTimeout(SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS);
-		serverSocket.bind(serverSocketAddress);
-		serverSocket.setReuseAddress(true);
-		System.out.println("\nServer is listening on port " + PORT);
+		int port = PORT;
+    boolean portAssigned = false;
+
+    for (int i = 0; i < MAX_PORT_ATTEMPTS; i++) {
+    	try {
+    		/* DONE: Crear una direción de socket a partir del puerto especificado */
+    		InetSocketAddress serverSocketAddress = new InetSocketAddress(port);
+    		/* DONE: Crear un socket servidor y ligarlo a la dirección de socket anterior */
+    		serverSocket = new ServerSocket();
+    		serverSocket.setSoTimeout(SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS);
+    		serverSocket.bind(serverSocketAddress);
+    		serverSocket.setReuseAddress(true);
+    		System.out.println("\nServer is listening on port " + port);
+    		portAssigned = true;
+    		break;
+    	} catch (IOException e) {
+    		// Puerto ocupado, prueba con el siguiente
+    		System.err.println("Port " + port + " is not available.");
+    		port++;
+    	}
+    }
+
+    if (!portAssigned) {
+    	throw new IOException("Failed to assign a port for the server after " + MAX_PORT_ATTEMPTS + " attempts.");
+    }
 	}
 
 	/**
