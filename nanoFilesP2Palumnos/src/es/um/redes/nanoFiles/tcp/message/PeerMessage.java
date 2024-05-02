@@ -25,7 +25,7 @@ public class PeerMessage {
 	 * 
 	 */
 	private String hash;
-	private long length;
+	private int length;
 	private FileInfo fileInfo;
 	private byte[] file;
 
@@ -43,11 +43,11 @@ public class PeerMessage {
 	 */
 	public byte getOpcode() { return opcode;	}
 	public String getHash() { return hash;	}
-	public long getLength() { return length; }
+	public int getLength() { return length; }
 	public byte[] getFile() { return file; }
 	public void setOpcode(byte op) { this.opcode = op;	}
 	public void setHash(String val) { this.hash = val; }
-	public void setLength(long len) { this.length = len;	}
+	public void setLength(int len) { this.length = len;	}
 	public void setFile(byte[] f) { this.file = f; }
 
 	/**
@@ -88,6 +88,7 @@ public class PeerMessage {
 				dis.readFully(dataHash);
 				String strHash=new String(dataHash,"UTF-8");
 				byte[] dataFile=new byte[lenFile];
+				dis.readFully(dataFile);
 				message.setLength(lenFile);
 				message.setHash(strHash);
 				message.setFile(dataFile);
@@ -103,6 +104,10 @@ public class PeerMessage {
 				break;
 			}
 		
+			case PeerMessageOps.OPCODE_TEST: {
+				System.out.println("The reading works");
+				break;
+			}
 		
 			default:
 			System.err.println("PeerMessage.readMessageFromInputStream doesn't know how to parse this message opcode: "
@@ -123,15 +128,15 @@ public class PeerMessage {
 		switch (opcode) {
 		case PeerMessageOps.OPCODE_DOWNLOAD_FROM: {
 			byte[] data=hash.getBytes("UTF-8");
-			dos.writeLong(data.length);
+			dos.writeInt(data.length);
 			dos.write(data);
 			break;
 		}
 
 		case PeerMessageOps.OPCODE_DOWNLOAD_OK: {
-			dos.writeLong(length);				//La longitud del fichero
+			dos.writeInt(length);				//La longitud del fichero
 			byte[] data=hash.getBytes("UTF-8");
-			dos.writeLong(data.length);
+			dos.writeInt(data.length);
 			dos.write(data);
 			dos.write(file);
 			break;
@@ -139,8 +144,13 @@ public class PeerMessage {
 		
 		case PeerMessageOps.OPCODE_FILE_NOT_FOUND: {
 			byte[] data=hash.getBytes("UTF-8");
-			dos.writeLong(data.length);
+			dos.writeInt(data.length);
 			dos.write(data);
+			break;
+		}
+		
+		case PeerMessageOps.OPCODE_TEST: {
+			System.out.println("The writing works");
 			break;
 		}
 		

@@ -54,8 +54,8 @@ public class NFServerComm {
 					}
 					try {
 						File f = new File(path);
-						DataInputStream fis = new DataInputStream(new FileInputStream(f));
-						long filelength = f.length();
+						DataInputStream fis = new DataInputStream(new FileInputStream(f)); //TODO: Server could not find the file
+						int filelength = (int) f.length();
 						byte data[] = new byte[(int) filelength];
 						fis.readFully(data);
 						

@@ -83,11 +83,20 @@ public class NFConnector {
 		PeerMessage msgIn = PeerMessage.readMessageFromInputStream(dis);
 		switch (msgIn.getOpcode()) {
 		case PeerMessageOps.OPCODE_DOWNLOAD_OK:
-			FileOutputStream fos = new FileOutputStream(file);
-//				fos.write(msgIn.getData());		//check how to write data from PeerMessage
+			byte[] data = msgIn.getFile();
 			
+			if (data != null) {
+			try (FileOutputStream fos = new FileOutputStream(file)){
+				fos.write(data);		//check how to write data from PeerMessage
+				
+				System.out.println("File successfully written: " + file.getAbsolutePath());
+				fos.close();
+			} catch (IOException e) {
+        System.err.println("Error writing file: " + e.getMessage());
+        e.printStackTrace();
+      }
+			}else System.err.println("File data is null.");
 			
-			fos.close();
 			break;
 			
 		case PeerMessageOps.OPCODE_FILE_NOT_FOUND:

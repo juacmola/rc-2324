@@ -9,6 +9,7 @@ public class PeerMessageOps {
 	public static final byte OPCODE_DOWNLOAD_FROM = 1;
 	public static final byte OPCODE_DOWNLOAD_OK = 2;
 	public static final byte OPCODE_FILE_NOT_FOUND = 3;
+	public static final byte OPCODE_TEST = 9;
 	
 
 	/**
@@ -21,14 +22,14 @@ public class PeerMessageOps {
 			OPCODE_DOWNLOAD_FROM,
 			OPCODE_DOWNLOAD_OK,
 			OPCODE_FILE_NOT_FOUND,
-			
+			OPCODE_TEST
 			};
 	private static final String[] _valid_operations_str = {
 			"INVALID_OPCODE",
 			"DOWNLOAD_FROM",
 			"DOWNLOAD_OK",
 			"FILE_NOT_FOUND",
-			
+			"OPCODE_TEST"
 			};
 
 	private static Map<String, Byte> _operation_to_opcode;
