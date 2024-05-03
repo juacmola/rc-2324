@@ -85,11 +85,11 @@ public class NFServerSimple {
 		 * cliente se hace en el método NFServerComm.serveFilesToClient(socket), al cual
 		 * hay que pasarle el socket devuelto por accept */
 			if (socket != null && socket.isConnected()) NFServerComm.serveFilesToClient(socket);
+			socket=null;
 		}
 		
-		if (socket != null)
-			socket.close();
-		
+//		if (socket != null) socket.close();
+		socket.close();
 		serverSocket.close();
 		System.out.println("NFServerSimple stopped. Returning to the nanoFiles shell...");
 	}
