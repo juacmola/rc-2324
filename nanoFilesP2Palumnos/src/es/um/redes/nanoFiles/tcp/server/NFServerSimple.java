@@ -88,8 +88,8 @@ public class NFServerSimple {
 			socket=null;
 		}
 		
-//		if (socket != null) socket.close();
-		socket.close();
+		if (socket != null) socket.close();
+//		socket.close();
 		serverSocket.close();
 		System.out.println("NFServerSimple stopped. Returning to the nanoFiles shell...");
 	}
