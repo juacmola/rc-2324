@@ -72,6 +72,13 @@ public class PeerMessage {
 		message.setOpcode(opcode);
 		
 		switch (opcode) {
+			case PeerMessageOps.OPCODE_AMBIGUOUS_HASH:
+			case PeerMessageOps.OPCODE_INVALID_CODE: 
+			case PeerMessageOps.OPCODE_END_OF_FILE: {
+				
+				break;
+			}
+		
 			case PeerMessageOps.OPCODE_DOWNLOAD_FROM: { //Nos quedamos con la cadena hash
 				int len=dis.readInt();
 				byte[] data=new byte[len];
@@ -133,7 +140,10 @@ public class PeerMessage {
 			break;
 		}
 
-		case PeerMessageOps.OPCODE_AMBIGUOUS_HASH:{
+		case PeerMessageOps.OPCODE_AMBIGUOUS_HASH: 
+		case PeerMessageOps.OPCODE_INVALID_CODE: 
+		case PeerMessageOps.OPCODE_END_OF_FILE: {
+		 
 			break;
 		}
 		

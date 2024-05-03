@@ -18,30 +18,30 @@ public class NFServerSimple {
 
 	public NFServerSimple() throws IOException {
 		int port = PORT;
-    boolean portAssigned = false;
+		boolean portAssigned = false;
 
-    for (int i = 0; i < MAX_PORT_ATTEMPTS; i++) {
-    	try {
-    		/* DONE: Crear una direción de socket a partir del puerto especificado */
-    		InetSocketAddress serverSocketAddress = new InetSocketAddress(port);
-    		/* DONE: Crear un socket servidor y ligarlo a la dirección de socket anterior */
-    		serverSocket = new ServerSocket();
-    		serverSocket.setSoTimeout(SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS);
-    		serverSocket.bind(serverSocketAddress);
-    		serverSocket.setReuseAddress(true);
-    		System.out.println("\nServer is listening on port " + port);
-    		portAssigned = true;
-    		break;
-    	} catch (IOException e) {
-    		// Puerto ocupado, prueba con el siguiente
-    		System.err.println("Port " + port + " is not available.");
-    		port++;
-    	}
-    }
+		for (int i = 0; i < MAX_PORT_ATTEMPTS; i++) {
+			try {
+				/* DONE: Crear una direción de socket a partir del puerto especificado */
+				InetSocketAddress serverSocketAddress = new InetSocketAddress(port);
+				/* DONE: Crear un socket servidor y ligarlo a la dirección de socket anterior */
+				serverSocket = new ServerSocket();
+				serverSocket.setSoTimeout(SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS);
+				serverSocket.bind(serverSocketAddress);
+				serverSocket.setReuseAddress(true);
+				System.out.println("\nServer is listening on port " + port);
+				portAssigned = true;
+				break;
+			} catch (IOException e) {
+				// Puerto ocupado, prueba con el siguiente
+				System.err.println("Port " + port + " is not available.");
+				port++;
+			}
+		}
 
-    if (!portAssigned) {
+		if (!portAssigned) {
     	throw new IOException("Failed to assign a port for the server after " + MAX_PORT_ATTEMPTS + " attempts.");
-    }
+		}
 	}
 
 	/**
@@ -87,6 +87,10 @@ public class NFServerSimple {
 			if (socket != null && socket.isConnected()) NFServerComm.serveFilesToClient(socket);
 		}
 		
+		if (socket != null)
+			socket.close();
+		
+		serverSocket.close();
 		System.out.println("NFServerSimple stopped. Returning to the nanoFiles shell...");
 	}
 }

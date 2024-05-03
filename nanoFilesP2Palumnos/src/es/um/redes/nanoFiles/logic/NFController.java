@@ -17,7 +17,7 @@ public class NFController {
 	 */
 	private static final byte LOGGED_OUT = 0;
 	private static final byte LOGGED_IN = 1;
-	private static final byte SERVER = 1;
+	//private static final byte SERVER = 1;
 	/*
 	 * TODO: Añadir más constantes que representen los estados del autómata del
 	 * cliente de directorio.
@@ -231,8 +231,9 @@ public class NFController {
 		boolean commandAllowed = true;
 		switch (currentCommand) {
 		
-			case NFCommands.COM_MYFILES: {
-				commandAllowed = true;
+			case NFCommands.COM_MYFILES:
+			case NFCommands.COM_QUIT: {
+				
 				break;
 			}
 			
@@ -252,19 +253,14 @@ public class NFController {
 				break;
 			}
 			//Case generalizado para todos los mensajes que no suponen un cambio de estado en el autómata y que solo se pueden ejecutar si estás logueado en el directorio.
-			case NFCommands.COM_USERLIST : {
+			case NFCommands.COM_USERLIST :
+			case NFCommands.COM_FGSERVE:
+			case NFCommands.COM_BGSERVE: {
 				if (currentState != LOGGED_IN) {
 					commandAllowed = false;
 					System.err.println("*You cannot run this command because you are not logged into the directory");
 				}
 				break;
-			}
-			
-			case NFCommands.COM_FGSERVE:{
-				if (currentState != LOGGED_IN) {
-					commandAllowed = false;
-					System.err.println("*You cannot run this command because you are not logged into the directory");
-				}
 			}
 
 		default:

@@ -5,21 +5,21 @@ public class NFCommands {
 	 * Códigos para todos los comandos soportados por el shell
 	 */
 	public static final byte COM_INVALID = 0;
-	public static final byte COM_QUIT = 1;
-	public static final byte COM_LOGIN = 2;
-	public static final byte COM_USERLIST = 3;
+	public static final byte COM_QUIT = 1;	//x
+	public static final byte COM_LOGIN = 2;	//x
+	public static final byte COM_USERLIST = 3;	//x
 	public static final byte COM_FILELIST = 4;
-	public static final byte COM_MYFILES = 6;
-	public static final byte COM_FGSERVE = 10;
-	public static final byte COM_BGSERVE = 11;
-	public static final byte COM_PUBLISH = 12;
+	public static final byte COM_MYFILES = 6;	//x
+	public static final byte COM_FGSERVE = 10;	//x
+	public static final byte COM_BGSERVE = 11;	//x
+	public static final byte COM_PUBLISH = 12;	
 	public static final byte COM_STOP_SERVER = 13;
 	public static final byte COM_DOWNLOADFROM = 23;
 	public static final byte COM_SEARCH = 24;
 	public static final byte COM_DOWNLOAD = 25;
-	public static final byte COM_LOGOUT = 30;
-	public static final byte COM_SLEEP = 49;
-	public static final byte COM_HELP = 50;
+	public static final byte COM_LOGOUT = 30;	//x
+	public static final byte COM_SLEEP = 49;	//x
+	public static final byte COM_HELP = 50;		//x
 	public static final byte COM_SOCKET_IN = 100;
 
 
