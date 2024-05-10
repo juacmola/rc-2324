@@ -85,7 +85,7 @@ public class NFServerSimple {
 		 * cliente se hace en el método NFServerComm.serveFilesToClient(socket), al cual
 		 * hay que pasarle el socket devuelto por accept */
 			if (socket != null && socket.isConnected()) NFServerComm.serveFilesToClient(socket);
-			socket=null;
+//			socket=null;
 		}
 		
 		if (socket != null) socket.close();
