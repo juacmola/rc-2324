@@ -10,13 +10,14 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import es.um.redes.nanoFiles.tcp.client.NFConnector;
+import es.um.redes.nanoFiles.tcp.server.NFServer;
 import es.um.redes.nanoFiles.tcp.server.NFServerSimple;
 
 public class NFControllerLogicP2P {
-	/* TODO: Para bgserve, se necesita un atributo NFServer que actuará como
+	/* DONE: Para bgserve, se necesita un atributo NFServer que actuará como
 	 * servidor de ficheros en segundo plano de este peer
 	 */
-
+	NFServer serverSegundoPlano = null;
 
 
 
@@ -28,18 +29,19 @@ public class NFControllerLogicP2P {
 	 * @throws IOException 
 	 */
 	protected void foregroundServeFiles() throws IOException {
+		NFServerSimple serverPrimerPlano = null;
 		/* DONE: Crear objeto servidor NFServerSimple y ejecutarlo en primer plano.*/
 		try {
-			NFServerSimple server = new NFServerSimple();
-			server.run();
+			serverPrimerPlano = new NFServerSimple();
 		}
-		/* TODO: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
+		/* DONE: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
 		 * este método. Si se produce una excepción de entrada/salida (error del que no
 		 * es posible recuperarse), se debe informar sin abortar el programa*/
 		catch (IOException e){
 			System.err.println("Error starting server: " + e.getMessage());
 		}
-
+		
+		serverPrimerPlano.run();
 
 	}
 
@@ -52,22 +54,27 @@ public class NFControllerLogicP2P {
 	 * 
 	 */
 	protected boolean backgroundServeFiles() {
-		/*
-		 * TODO: Comprobar que no existe ya un objeto NFServer previamente creado, en
+		/*DONE: Comprobar que no existe ya un objeto NFServer previamente creado, en
 		 * cuyo caso el servidor ya está en marcha. Si no lo está, crear objeto servidor
 		 * NFServer y arrancarlo en segundo plano creando un nuevo hilo. Finalmente,
 		 * comprobar que el servidor está escuchando en un puerto válido (>0) e imprimir
 		 * mensaje informando sobre el puerto, y devolver verdadero.
 		 */
-		/*
-		 * TODO: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
-		 * este método. Si se produce una excepción de entrada/salida (error del que no
-		 * es posible recuperarse), se debe informar sin abortar el programa
-		 */
+		if (serverSegundoPlano == null) {
+			try {serverSegundoPlano = new NFServer();} 
+			/*DONE: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
+			 * este método. Si se produce una excepción de entrada/salida (error del que no
+			 * es posible recuperarse), se debe informar sin abortar el programa
+			 */
+			catch (IOException e) {System.err.println("Error starting server: " + e.getMessage());}
+		}
+		serverSegundoPlano.run();
+		
+		if (serverSegundoPlano.getServerPort() <= 0) return false;
+		
+		System.out.println("BG server is running on PORT: " + serverSegundoPlano.getServerPort());
 
-
-
-		return false;
+		return true;
 	}
 
 	/**
@@ -94,22 +101,20 @@ public class NFControllerLogicP2P {
 		File newlocalFileName = new File(localFileName);
 		try {
 			if (newlocalFileName.exists()) {
-				System.err.println("There is already a file with this name. Try a different one");
-				return result;
+				throw new FileAlreadyExistsException("There is already a file with this name. Try a different one");
 			}
 			NFConnector connector = new NFConnector(fserverAddr);
 			result = connector.downloadFile(targetFileHash, newlocalFileName);
 			
 			if (result) System.out.println("File downloaded successfully");
 			else System.out.println("File could not be downloaded");
-		}catch (FileAlreadyExistsException e) {}
+		}catch (FileAlreadyExistsException e) { System.err.println(e.getMessage()); }
 		/* DONE: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
 		 * este método. Si se produce una excepción de entrada/salida (error del que no
 		 * es posible recuperarse), se debe informar sin abortar el programa*/
 		catch (IOException e) {
 			System.err.println("There was an error downloading the file: " + e.getMessage());
 		}
-
 
 		return result;
 	}
@@ -137,6 +142,8 @@ public class NFControllerLogicP2P {
 		 * informa y no se realiza la descarga. Si todo va bien, imprimir mensaje
 		 * informando de que se ha completado la descarga.*/
 		
+//		NFConnector connector = new NFConnector();
+		
 		/* TODO: Las excepciones que puedan lanzarse deben ser capturadas y tratadas en
 		 * este método. Si se produce una excepción de entrada/salida (error del que no
 		 * es posible recuperarse), se debe informar sin abortar el programa*/
@@ -154,27 +161,19 @@ public class NFControllerLogicP2P {
 	 */
 	public int getServerPort() {
 		int port = 0;
-		/*
-		 * TODO: Devolver el puerto de escucha de nuestro servidor de ficheros en
-		 * segundo plano
-		 */
-
-
-
+		/*DONE: Devolver el puerto de escucha de nuestro servidor de ficheros en segundo plano*/
+		if (serverSegundoPlano != null) port =	serverSegundoPlano.getServerPort();
+		
 		return port;
 	}
 
 	/**
 	 * Método para detener nuestro servidor de ficheros en segundo plano
-	 * 
+	 * @throws IOException 
 	 */
-	public void stopBackgroundFileServer() {
-		/*
-		 * TODO: Enviar señal para detener nuestro servidor de ficheros en segundo plano
-		 */
-
-
-
+	public void stopBackgroundFileServer() throws IOException {
+		/*DONE: Enviar señal para detener nuestro servidor de ficheros en segundo plano*/
+		serverSegundoPlano.stopserver();
 	}
 
 }

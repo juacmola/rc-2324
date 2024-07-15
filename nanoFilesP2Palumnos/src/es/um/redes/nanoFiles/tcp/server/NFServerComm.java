@@ -131,7 +131,9 @@ public class NFServerComm {
 
 				}
 		}
-//		socket.close();
+//		dis.close();
+//		dos.close();
+		socket.close();
 	}
 
 

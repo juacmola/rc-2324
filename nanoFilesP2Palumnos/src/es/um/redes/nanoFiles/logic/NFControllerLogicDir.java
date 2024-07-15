@@ -60,15 +60,18 @@ public class NFControllerLogicDir {
 		 * sesión asignada por el directorio. Devolver éxito/fracaso de la operación.*/
 		boolean result = false;
 		
-		this.directoryConnector = new DirectoryConnector(directoryHostname); 
+		try{
+			this.directoryConnector = new DirectoryConnector(directoryHostname); 
+		}catch (Exception e) {
+			System.err.println("The host you wrote is not known");
+			return result=false;
+		}
 		
 		result = directoryConnector.logIntoDirectory(nickname);
 		
 		if (result)
 			System.out.println("Login was successful with " + directoryConnector.getSessionKey() + " key");
-		
-		else 
-			System.err.println("Login was unsuccessful");
+		else System.err.println("Login was unsuccessful");
 		
 		return result;
 	}
@@ -151,8 +154,7 @@ public class NFControllerLogicDir {
 	 */
 
 	public boolean registerFileServer(int serverPort) {
-		/*
-		 * TODO: Darse de alta en el directorio como servidor. Comunicarse con el
+		/*DONE: Darse de alta en el directorio como servidor. Comunicarse con el
 		 * directorio (a través del directoryConnector) para enviar el número de puerto
 		 * TCP en el que escucha el servidor de ficheros que habremos arrancado
 		 * previamente. Se debe enviar la clave de sesión para identificarse. Devolver
@@ -160,8 +162,8 @@ public class NFControllerLogicDir {
 		 */
 		boolean result = false;
 
-
-
+		if (directoryConnector.registerServerPort(serverPort)) result = true;
+		
 		return result;
 	}
 
@@ -195,16 +197,19 @@ public class NFControllerLogicDir {
 	 *         sirviendo ficheros.
 	 */
 	private InetSocketAddress lookupServerAddrByUsername(String nickname) {
-		/*
-		 * TODO: Obtener IP:puerto de un servidor de ficheros a partir de su nickname.
+		InetSocketAddress serverAddr = null;
+		/*DONE: Obtener IP:puerto de un servidor de ficheros a partir de su nickname.
 		 * Comunicarse con el directorio (a través del directoryConnector) para
 		 * preguntar la dirección de socket en la que el usuario con 'nickname' está
 		 * sirviendo ficheros. Si la operación fracasa (no se obtiene una respuesta con
 		 * IP:puerto válidos), se debe devolver null.
 		 */
-		InetSocketAddress serverAddr = null;
-
-
+		try {
+			serverAddr = directoryConnector.lookupServerAddrByUsername(nickname);
+		} catch (UnknownHostException e) {
+			System.err.println("There was an error sending the IP");
+			e.printStackTrace();
+		}
 
 		return serverAddr;
 	}
@@ -222,7 +227,7 @@ public class NFControllerLogicDir {
 	 */
 	public InetSocketAddress getServerAddress(String serverNicknameOrSocketAddr) throws IOException {
 		InetSocketAddress fserverAddr = null;
-		/* TODO: Averiguar si el nickname es en realidad una cadena "IP:puerto", en cuyo
+		/* DONE: Averiguar si el nickname es en realidad una cadena "IP:puerto", en cuyo
 		 * caso no es necesario comunicarse con el directorio (simplemente se devuelve
 		 * un InetSocketAddress); en otro caso, utilizar el método
 		 * lookupServerAddrByUsername de esta clase para comunicarse con el directorio y
@@ -240,7 +245,7 @@ public class NFControllerLogicDir {
 			String serverPort = serverNicknameOrSocketAddr.substring(idx + 1).trim();
 			fserverAddr = new InetSocketAddress(serverIP, Integer.parseInt(serverPort));
 		} else {
-			/* TODO: Si es un nickname, preguntar al directorio la IP:puerto asociada a
+			/* DONE: Si es un nickname, preguntar al directorio la IP:puerto asociada a
 			 * dicho peer servidor. */
 			fserverAddr = lookupServerAddrByUsername(serverNicknameOrSocketAddr);
 		}

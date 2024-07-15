@@ -1,5 +1,6 @@
 package es.um.redes.nanoFiles.udp.message;
 
+import java.net.InetAddress;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +33,8 @@ public class DirMessage {
 	private static final String FIELDNAME_NICKNAME = "nickname";
 	private static final String FIELDNAME_SESSIONKEY = "sessionKey";
 	private static final String FIELDNAME_USER = "user";
+	private static final String FIELDNAME_PORT = "port";
+	private static final String FIELDNAME_IP = "ip";
 
 
 	/**
@@ -44,6 +47,8 @@ public class DirMessage {
 	 */
 	private String nickname = DirMessageOps.NICKNAME_INVALID;
 	private int sessionKey = DirMessageOps.SESSIONKEY_INVALID;
+	private int port = DirMessageOps.PORT_INVALID;
+	private String ip = DirMessageOps.IP_INVALID;
 	private HashSet<String> usersList = new HashSet<>();
 
 
@@ -75,6 +80,14 @@ public class DirMessage {
 		return Collections.unmodifiableSet(usersList);
 	}
 	
+	public int getPort() {
+		return port;
+	}
+	
+	public String getIP() {
+		return ip;
+	}
+	
 	//Setters
 	public void setNickname(String nick) {
 		this.nickname = nick;
@@ -88,7 +101,13 @@ public class DirMessage {
 		this.usersList.addAll(nicks.keySet());
 	}
 	
-
+	public void setPort(int port) {
+		this.port = port;
+	}
+	
+	public void setIP(String address) {
+		this.ip = address;
+	}
 
 
 
@@ -102,8 +121,7 @@ public class DirMessage {
 	 *         etc.)
 	 */
 	public static DirMessage fromString(String message) {
-		/*
-		 * TODO: Usar un bucle para parsear el mensaje línea a línea, extrayendo para
+		/*TODO: Usar un bucle para parsear el mensaje línea a línea, extrayendo para
 		 * cada línea el nombre del campo y el valor, usando el delimitador DELIMITER, y
 		 * guardarlo en variables locales.
 		 */
@@ -113,8 +131,6 @@ public class DirMessage {
 		String[] lines = message.split(END_LINE + "");
 		// Local variables to save data during parsing
 		DirMessage m = null;
-
-
 
 		for (String line : lines) {
 			int idx = line.indexOf(DELIMITER); // Posición del delimitador
@@ -142,6 +158,14 @@ public class DirMessage {
 				m.usersList.add(value);
 				break;
 			}
+			
+			case FIELDNAME_PORT:{
+				m.port = Integer.parseInt(value);
+			}
+			
+			case FIELDNAME_IP:{
+				m.ip = value;
+			}
 
 
 
@@ -151,9 +175,6 @@ public class DirMessage {
 				System.exit(-1);
 			}
 		}
-
-
-
 
 		return m;
 	}
@@ -175,7 +196,8 @@ public class DirMessage {
 		 * del objeto.
 		 */
 		switch(operation) {
-			case DirMessageOps.OPERATION_LOGIN: {
+			case DirMessageOps.OPERATION_LOGIN:
+			case DirMessageOps.OPERATION_GETADDR_FROM_NICK: {
 				sb.append(FIELDNAME_NICKNAME + DELIMITER + nickname + END_LINE);
 				break;
 			}
@@ -200,7 +222,18 @@ public class DirMessage {
 				break;
 			}
 			
+			case DirMessageOps.OPERATION_REGISTER_SERVER: {
+				sb.append(FIELDNAME_SESSIONKEY + DELIMITER + sessionKey + END_LINE);
+				sb.append(FIELDNAME_PORT + DELIMITER + port + END_LINE);
+			}
 			
+			//TODO: Pensar que tiene que devolver. Yo creo que así está bien
+			case DirMessageOps.OPERATION_REGISTER_SERVER_OK:{}
+			
+			case DirMessageOps.OPERATION_GETADDR_RESP:{
+				sb.append(FIELDNAME_SESSIONKEY + DELIMITER + ip + END_LINE);
+				sb.append(FIELDNAME_PORT + DELIMITER + port + END_LINE);
+			}
 		
 		}
 

@@ -59,14 +59,14 @@ public class NFServerSimple {
 		/* DONE: Comprobar que el socket servidor está creado y ligado */
 		if (serverSocket != null && serverSocket.isBound()) {
 			System.out.println("Server socket is running on " + serverSocket.getLocalSocketAddress());
-			System.out.println("Write the command " + STOP_SERVER_COMMAND + " to stop the server");
+			System.out.println("***Write the command " + STOP_SERVER_COMMAND + " to stop the server***");
 		}else {
 			System.err.println("Server socket is not properly running or binding");
 			return;
 		}
+		
 		/* DONE: Usar el socket servidor para esperar conexiones de otros peers que
 		 * soliciten descargar ficheros */
-		
 		while (!shutDownServer) {
 			try {
 				socket = serverSocket.accept();
@@ -84,12 +84,10 @@ public class NFServerSimple {
 		/* DONE: Al establecerse la conexión con un peer, la comunicación con dicho
 		 * cliente se hace en el método NFServerComm.serveFilesToClient(socket), al cual
 		 * hay que pasarle el socket devuelto por accept */
-			if (socket != null && socket.isConnected()) NFServerComm.serveFilesToClient(socket);
-//			socket=null;
+			if (socket != null && !socket.isClosed()) NFServerComm.serveFilesToClient(socket);
 		}
 		
-		if (socket != null) socket.close();
-//		socket.close();
+//		if (socket != null) socket.close();
 		serverSocket.close();
 		System.out.println("NFServerSimple stopped. Returning to the nanoFiles shell...");
 	}

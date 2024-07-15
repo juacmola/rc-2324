@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
 import javax.sound.midi.SysexMessage;
@@ -295,11 +296,34 @@ public class DirectoryConnector {
 	 *         servidor.
 	 */
 	public boolean registerServerPort(int serverPort) {
-		// TODO: Ver TODOs en logIntoDirectory y seguir esquema similar
+		// DONE: Ver TODOs en logIntoDirectory y seguir esquema similar
 		boolean success = false;
-
-
-
+		
+		DirMessage dirMessageToDirectory = new DirMessage(DirMessageOps.OPERATION_REGISTER_SERVER);
+		dirMessageToDirectory.setSessionKey(sessionKey);
+		dirMessageToDirectory.setPort(serverPort);
+		
+		String messageToDirectory = dirMessageToDirectory.toString();
+		
+		byte[] requestData = messageToDirectory.getBytes();
+		byte response[] = null;
+		try {
+			response = sendAndReceiveDatagrams(requestData);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String responseFromDirectory = new String(response);
+		DirMessage dirMessageFromDirectory = DirMessage.fromString(responseFromDirectory);
+		
+		String confirmation = dirMessageFromDirectory.getOperation();
+		
+		if (confirmation.equals("registerServerOK")) {
+			success = true;
+			System.out.println("File Server was set in port " + serverPort);
+		}else {
+		System.err.println("Couldn't set File Server in port " + serverPort);
+		}
+		
 		return success;
 	}
 
@@ -311,12 +335,37 @@ public class DirectoryConnector {
 	 * @return La dirección de socket del servidor en caso de que haya algún
 	 *         servidor dado de alta en el directorio con ese nick, o null en caso
 	 *         contrario.
+	 * @throws UnknownHostException 
 	 */
-	public InetSocketAddress lookupServerAddrByUsername(String nick) {
+	public InetSocketAddress lookupServerAddrByUsername(String nick) throws UnknownHostException {
 		InetSocketAddress serverAddr = null;
-		// TODO: Ver TODOs en logIntoDirectory y seguir esquema similar
-
-
+		// DONE: Ver TODOs en logIntoDirectory y seguir esquema similar
+			DirMessage dirMessageToDirectory = new DirMessage(DirMessageOps.OPERATION_GETADDR_FROM_NICK);
+			dirMessageToDirectory.setNickname(nick);
+			
+			String messageToDirectory = dirMessageToDirectory.toString();
+			byte[] requestData = messageToDirectory.getBytes();
+			byte response[] = null;
+			
+			try {
+				response = sendAndReceiveDatagrams(requestData);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			String responseFromDirectory = new String(response);
+			DirMessage dirMessageFromDirectory = DirMessage.fromString(responseFromDirectory);
+			
+			String confirmation = dirMessageFromDirectory.getOperation();
+			String address = dirMessageFromDirectory.getIP();
+			int port = dirMessageFromDirectory.getPort();
+			
+			if (confirmation.equals("getAddrResp") ) {
+				InetAddress ip = InetAddress.getByName(address);
+				serverAddr = new InetSocketAddress(ip, port);
+				System.out.println("The address sent by Directory is " + ip + ":" + port);
+			}else {
+				System.err.println("There was an error sending the address");
+			}
 
 		return serverAddr;
 	}
