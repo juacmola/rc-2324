@@ -163,7 +163,7 @@ public class NFControllerLogicDir {
 		boolean result = false;
 
 		if (directoryConnector.registerServerPort(serverPort)) result = true;
-		
+		System.out.println("*****FUNCIONA*****");
 		return result;
 	}
 
@@ -309,14 +309,13 @@ public class NFControllerLogicDir {
 	 * @return Éxito o fracaso de la operación
 	 */
 	public boolean unregisterFileServer() {
-		/*
-		 * TODO: Comunicarse con el directorio (a través del directoryConnector) para
+		/*TODO: Comunicarse con el directorio (a través del directoryConnector) para
 		 * darse de baja como servidor de ficheros. Se debe enviar la clave de sesión
 		 * para identificarse.
 		 */
 		boolean result = false;
 
-
+		
 
 		return result;
 	}

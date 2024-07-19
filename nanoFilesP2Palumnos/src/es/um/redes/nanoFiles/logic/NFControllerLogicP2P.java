@@ -68,7 +68,7 @@ public class NFControllerLogicP2P {
 			 */
 			catch (IOException e) {System.err.println("Error starting server: " + e.getMessage());}
 		}
-		serverSegundoPlano.run();
+		serverSegundoPlano.startBG();
 		
 		if (serverSegundoPlano.getServerPort() <= 0) return false;
 		

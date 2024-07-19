@@ -20,7 +20,7 @@ public class NFServer implements Runnable {
 	public NFServer() throws IOException {
 		/* DONE: Crear un socket servidor y ligarlo a cualquier puerto disponible*/
 		serverSocket = new ServerSocket();
-//		serverSocket.setSoTimeout(SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS);	No descomentarlo hasta probar que funciona
+//		serverSocket.setSoTimeout(SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS);	//No descomentarlo hasta probar que funciona
 		InetSocketAddress serverSocketAddress = new InetSocketAddress(PORT);
 		serverSocket.bind(serverSocketAddress);
 	}
@@ -39,7 +39,9 @@ public class NFServer implements Runnable {
 			try { socket = serverSocket.accept();
 			System.out.println("\nNew client connected to NFServer: " +
 					socket.getInetAddress().toString() + ":" + socket.getPort());
-			} catch (IOException e) {
+//			}catch (SocketTimeoutException e) {
+//				System.err.println("Timeout ocurrence");
+			}catch (IOException e) {
 				System.err.println("There was a problem");
 				e.printStackTrace();
 			}
@@ -52,7 +54,7 @@ public class NFServer implements Runnable {
 			 * servidor.*/
 			if (socket != null && socket.isConnected()) {
 				st = new NFServerThread(socket);
-				startThread();
+				st.start();
 			}
 		}
 
@@ -65,8 +67,8 @@ public class NFServer implements Runnable {
 
 	/** 1) Arrancar el servidor en un hilo nuevo que se ejecutará en segundo plano
 	 */
-	public void startThread() {
-		this.st.start();
+	public void startBG() {
+		new Thread(this).start();
 	}
 
 	/** 2) Detener el servidor (stopserver)

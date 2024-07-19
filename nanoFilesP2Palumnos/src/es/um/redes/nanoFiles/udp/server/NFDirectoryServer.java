@@ -264,6 +264,8 @@ public class NFDirectoryServer {
 				System.out.print("operation:" + response.getOperation() + "\n\n");
 				break;
 			}
+			
+			case DirMessageOps.OPERATION_REGISTER_SERVER:{}
 
 
 

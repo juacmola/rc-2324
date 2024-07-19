@@ -119,7 +119,7 @@ public class DirectoryConnector {
 				paqueteRecibido = true;
 				
 			}catch(SocketTimeoutException e) {
-				System.out.println("Timeout is over. Trying again... ");
+				System.err.println("Timeout is over. Trying again... ");
 				socket.send(packetToDirectory);
 				numeroIntentos++;
 				

@@ -59,7 +59,7 @@ public class NFServerComm {
 							writeMessage = new PeerMessage(PeerMessageOps.OPCODE_AMBIGUOUS_HASH);
 							System.err.println("Client sent ambiguous hash");
 						}
-
+						int paquete = 0;
 						try {
 							File f = new File(path);
 							DataInputStream fis = new DataInputStream(new FileInputStream(f));
@@ -70,53 +70,33 @@ public class NFServerComm {
 									byte data[] = new byte[(int) fileLength];
 									fis.readFully(data);
 
-									writeMessage = new PeerMessage(PeerMessageOps.OPCODE_DOWNLOAD_OK);
+									writeMessage = new PeerMessage(PeerMessageOps.OPCODE_END_OF_FILE);
+									System.out.println("Este es el opcode: " + writeMessage.getOpcode());
 									writeMessage.setLength(fileLength);
 									writeMessage.setHash(hashToClient);
 									writeMessage.setFile(data);
 									writeMessage.writeMessageToOutputStream(dos);
 									
 									fileLength=0;
+									System.out.println("Se envió el último paquete");
 								}else {
 									byte data[] = new byte[8192];
 									fis.readFully(data);
 
 									writeMessage = new PeerMessage(PeerMessageOps.OPCODE_DOWNLOAD_OK);
+									System.out.println("Este es el opcode: " + writeMessage.getOpcode());
 									writeMessage.setLength(fileLength);
 									writeMessage.setHash(hashToClient);
 									writeMessage.setFile(data);
 									writeMessage.writeMessageToOutputStream(dos);
-									
+									System.out.println("Se envió el paquete número " + paquete);
+									paquete++;
 									fileLength-=8192;
 								}
 							}
 
-//							if (fileLength==0) {
-//								writeMessage = new PeerMessage(PeerMessageOps.OPCODE_END_OF_FILE);
-//								writeMessage.writeMessageToOutputStream(dos);
-//							}
-
 							fis.close();
 							System.out.println("The download of the file was successful");
-
-							/*	try {
-							File f = new File(path);
-							DataInputStream fis = new DataInputStream(new FileInputStream(f));
-							int fileLength = (int) f.length();
-							byte data[] = new byte[(int) fileLength];
-							fis.readFully(data);
-
-							writeMessage = new PeerMessage(PeerMessageOps.OPCODE_DOWNLOAD_OK);
-							writeMessage.setLength(fileLength);
-							writeMessage.setHash(targethash);
-							writeMessage.setFile(data);
-							writeMessage.writeMessageToOutputStream(dos);
-
-							fis.close();
-							System.out.println("The download of the file was successful");
-
-						}
-						 */
 						}catch (FileNotFoundException e) {
 							writeMessage = new PeerMessage(PeerMessageOps.OPCODE_FILE_NOT_FOUND);
 							writeMessage.setHash(targethash);

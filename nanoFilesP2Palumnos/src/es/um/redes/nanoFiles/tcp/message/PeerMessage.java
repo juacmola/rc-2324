@@ -33,7 +33,7 @@ public class PeerMessage {
 	public PeerMessage() {}
 
 	public PeerMessage(byte op) {
-		opcode = op;
+		this.opcode = op;
 	}
 	
 	/*
@@ -73,8 +73,7 @@ public class PeerMessage {
 		
 		switch (opcode) {
 			case PeerMessageOps.OPCODE_AMBIGUOUS_HASH:
-			case PeerMessageOps.OPCODE_INVALID_CODE: 
-			case PeerMessageOps.OPCODE_END_OF_FILE: {
+			case PeerMessageOps.OPCODE_INVALID_CODE: {
 				
 				break;
 			}
@@ -88,6 +87,7 @@ public class PeerMessage {
 				break;
 			}
 
+			case PeerMessageOps.OPCODE_END_OF_FILE:
 			case PeerMessageOps.OPCODE_DOWNLOAD_OK: {
 				int lenFile=dis.readInt();
 				int lenHash=dis.readInt();
@@ -141,12 +141,12 @@ public class PeerMessage {
 		}
 
 		case PeerMessageOps.OPCODE_AMBIGUOUS_HASH: 
-		case PeerMessageOps.OPCODE_INVALID_CODE: 
-		case PeerMessageOps.OPCODE_END_OF_FILE: {
+		case PeerMessageOps.OPCODE_INVALID_CODE: {
 		 
 			break;
 		}
 		
+		case PeerMessageOps.OPCODE_END_OF_FILE:
 		case PeerMessageOps.OPCODE_DOWNLOAD_OK: {
 			dos.writeInt(length);				//La longitud del fichero
 			byte[] data=hash.getBytes("UTF-8");

@@ -82,15 +82,29 @@ public class NFConnector {
 		PeerMessage msgIn = PeerMessage.readMessageFromInputStream(dis);
 		FileOutputStream fos = new FileOutputStream(file);
 
-		while (msgIn.getLength()>=8192){
+		while (msgIn.getLength()>=0){
 			switch (msgIn.getOpcode()) {
 			case PeerMessageOps.OPCODE_DOWNLOAD_OK:
-				byte[] data = msgIn.getFile();
-
-				if (data != null) fos.write(data);		//check how to write data from PeerMessage
-				else System.err.println("File data is null.");
-				
-				break;
+      case PeerMessageOps.OPCODE_END_OF_FILE:
+          byte[] data = msgIn.getFile();
+          if (data != null) fos.write(data); // write data to file
+          else System.err.println("File data is null.");
+          
+          System.out.println("El opcode que recibe el cliente es: " + msgIn.getOpcode());
+          
+          if (msgIn.getOpcode() == PeerMessageOps.OPCODE_END_OF_FILE) {
+              System.out.println("File successfully written: " + file.getAbsolutePath());
+              fos.close();
+              if (msgIn.getHash().equals(FileDigest.computeFileChecksumString(file.getName()))) {
+                  System.out.println("Same hash!");
+              } else {
+                  System.err.println("Hash does not match!");
+              }
+              socket.close();
+              return downloaded = true;
+          }
+          msgIn = PeerMessage.readMessageFromInputStream(dis);
+          break;
 
 			case PeerMessageOps.OPCODE_AMBIGUOUS_HASH:
 				System.err.println("Your hash is ambiguous.");
@@ -98,86 +112,30 @@ public class NFConnector {
 				System.err.println("Requested file not found on the server.");
 				String hashError = msgIn.getHash();
 				System.out.println(hashError);
-				return downloaded;
+				return downloaded = false;
 			case PeerMessageOps.OPCODE_INVALID_CODE:
 				System.out.println("Write a valid operation");
-				return downloaded;
+				return downloaded = false;
 			default:
 				System.err.println("Unexpected response from the server.");
-				return downloaded;
+				return downloaded = false;
 			}
-			msgIn = PeerMessage.readMessageFromInputStream(dis);
+//			msgIn = PeerMessage.readMessageFromInputStream(dis);
 		}
-		if (msgIn.getLength()<8192) {
-			byte[] data = msgIn.getFile();
-
-			if (data != null) fos.write(data);		//check how to write data from PeerMessage
-			System.out.println("File successfully written: " + file.getAbsolutePath());
-			fos.close();
-			if (msgIn.getHash().equals(FileDigest.computeFileChecksumString(file.getName()))) {
-				System.out.println("Same hash!");
-			} else System.err.println("Hash does not match!");
-
-		}
-
-
-		
-//		switch (msgIn.getOpcode()) {
-//		case PeerMessageOps.OPCODE_DOWNLOAD_OK:
+//		if (msgIn.getLength()<8192) {
 //			byte[] data = msgIn.getFile();
-//			
-//			if (data != null) {
-//				fos.write(data);		//check how to write data from PeerMessage
-//				
-//				System.out.println("File successfully written: " + file.getAbsolutePath());
-//				fos.close();
-//			
-//			}else System.err.println("File data is null.");
-//			
-//			break;
-//		case PeerMessageOps.OPCODE_AMBIGUOUS_HASH:
-//			System.err.println("Your hash is ambiguous.");
-//		case PeerMessageOps.OPCODE_FILE_NOT_FOUND:
-//			System.err.println("Requested file not found on the server.");
-//			String hashError = msgIn.getHash();
-//			System.out.println(hashError);
-//			return downloaded;
-//		case PeerMessageOps.OPCODE_INVALID_CODE:
-//			System.out.println("Write a valid operation");
-//			return downloaded;
-//		default:
-//			System.err.println("Unexpected response from the server.");
-//			return downloaded;
-//		}
-//		msgIn = PeerMessage.readMessageFromInputStream(dis);
-
-		
-		
-//		if (msgIn.getHash() != null) {
+//
+//			if (data != null) fos.write(data);		//check how to write data from PeerMessage
+//			System.out.println("File successfully written: " + file.getAbsolutePath());
+//			fos.close();
 //			if (msgIn.getHash().equals(FileDigest.computeFileChecksumString(file.getName()))) {
 //				System.out.println("Same hash!");
 //			} else System.err.println("Hash does not match!");
+//
 //		}
 
-		
-//		if (msgIn.getOpcode()==PeerMessageOps.OPCODE_END_OF_FILE) {
-//			System.out.println("File successfully written: " + file.getAbsolutePath());
-//			fos.close();
-//			byte op = PeerMessageOps.operationToOpcode("END_CONNECTION");
-//			PeerMessage msg = new PeerMessage(op);
-//			msg.writeMessageToOutputStream(dos);
-//		}
-		
-		/*
-		 * TODO: Finalmente, comprobar la integridad del fichero creado para comprobar
-		 * que es idéntico al original, calculando el hash a partir de su contenido con
-		 * FileDigest.computeFileChecksumString y comparándolo con el hash completo del
-		 * fichero solicitado. Para ello, es necesario obtener del servidor el hash
-		 * completo del fichero descargado, ya que quizás únicamente obtuvimos una
-		 * subcadena del mismo como parámetro.
-		 */
-
-		socket.close();
+//		socket.close();
+		fos.close();
 		downloaded = true;
 		return downloaded;
 	}
