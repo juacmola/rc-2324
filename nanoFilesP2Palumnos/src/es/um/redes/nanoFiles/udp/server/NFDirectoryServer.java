@@ -43,7 +43,7 @@ public class NFDirectoryServer {
 	 * funcionalidad del sistema nanoFilesP2P: ficheros publicados, servidores
 	 * registrados, etc. Luego, inicializarlas.
 	 */
-
+	private HashMap<Integer, Integer> peers;
 
 
 
@@ -69,6 +69,7 @@ public class NFDirectoryServer {
 		 * (estructuras de datos que mantiene el servidor: nicks, sessionKeys, etc.) */
 		this.nicks = new HashMap<>();
 		this.sessionKeys = new HashMap<>();
+		this.peers = new HashMap<>();
 
 		if (NanoFiles.testMode) {
 			if (socket == null || nicks == null || sessionKeys == null) {
@@ -251,7 +252,6 @@ public class NFDirectoryServer {
 					nicks.remove(sessionKeys.remove(msg.getSessionKey()));
 					response = new DirMessage(DirMessageOps.OPERATION_LOGOUTOK);
 				}
-			
 				else {
 					response = new DirMessage(DirMessageOps.OPERATION_LOGOUTFAIL);
 				}
@@ -265,7 +265,42 @@ public class NFDirectoryServer {
 				break;
 			}
 			
-			case DirMessageOps.OPERATION_REGISTER_SERVER:{}
+			case DirMessageOps.OPERATION_REGISTER_SERVER:{
+				int sessionKey = msg.getSessionKey();
+				int port = msg.getPort();
+				
+				String nick = sessionKeys.get(sessionKey);
+				
+				peers.put(sessionKey, port);
+				response = new DirMessage(DirMessageOps.OPERATION_REGISTER_SERVER_OK);
+				
+				/*
+				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
+				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
+				 * servidor
+				 */
+				System.out.print("operation:" + response.getOperation() + nick + "\n\n");
+				break;
+			}
+			
+			case DirMessageOps.OPERATION_STOP_SERVER: {
+				
+				if (peers.containsKey(msg.getSessionKey())) {
+					peers.remove(msg.getSessionKey());
+					response = new DirMessage(DirMessageOps.OPERATION_STOP_SERVER_OK);
+				}
+				else {
+					response = new DirMessage(DirMessageOps.OPERATION_STOP_SERVER_FAIL);
+				}
+			
+				/*
+				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
+				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
+				 * servidor
+				 */
+				System.out.print("operation:" + response.getOperation() + "\n\n");
+				break;
+			}
 
 
 

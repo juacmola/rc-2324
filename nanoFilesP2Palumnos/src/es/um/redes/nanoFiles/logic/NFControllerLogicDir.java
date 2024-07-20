@@ -87,14 +87,10 @@ public class NFControllerLogicDir {
 		 * identificarse. Devolver éxito/fracaso de la operación.
 		 */
 		boolean result = false;
-
 		result = directoryConnector.logoutFromDirectory();
 		
-		if (result)
-			System.out.println("Logout was successful");
-		
-		else 
-			System.err.println("Logout was unsuccessful");
+		if (result) System.out.println("Logout was successful");
+		else System.err.println("Logout was unsuccessful");
 
 		return result;
 	}
@@ -118,11 +114,8 @@ public class NFControllerLogicDir {
 		
 			result = true;
 		}
-		
 		else
 			System.err.println("The directory wasn't able to provide the list of users.");
-
-
 
 		return result;
 	}
@@ -163,7 +156,7 @@ public class NFControllerLogicDir {
 		boolean result = false;
 
 		if (directoryConnector.registerServerPort(serverPort)) result = true;
-		System.out.println("*****FUNCIONA*****");
+		System.out.println("*****FUNCIONA!!!!!*****");
 		return result;
 	}
 
@@ -227,6 +220,7 @@ public class NFControllerLogicDir {
 	 */
 	public InetSocketAddress getServerAddress(String serverNicknameOrSocketAddr) throws IOException {
 		InetSocketAddress fserverAddr = null;
+		InetAddress serverIP = null;
 		/* DONE: Averiguar si el nickname es en realidad una cadena "IP:puerto", en cuyo
 		 * caso no es necesario comunicarse con el directorio (simplemente se devuelve
 		 * un InetSocketAddress); en otro caso, utilizar el método
@@ -240,7 +234,11 @@ public class NFControllerLogicDir {
 			int idx = serverNicknameOrSocketAddr.indexOf(":"); // Posición del delimitador
 			
 			String address = serverNicknameOrSocketAddr.substring(0, idx);
-			InetAddress serverIP = InetAddress.getByName(address);
+			try{ serverIP = InetAddress.getByName(address);
+			}catch (Exception e) {
+				System.err.println("The host you wrote is not known");
+				return fserverAddr;
+			}
 			
 			String serverPort = serverNicknameOrSocketAddr.substring(idx + 1).trim();
 			fserverAddr = new InetSocketAddress(serverIP, Integer.parseInt(serverPort));
@@ -315,7 +313,10 @@ public class NFControllerLogicDir {
 		 */
 		boolean result = false;
 
+		result = directoryConnector.stopBackGroundServer();
 		
+		if (result) System.out.println("The background server was stopped");
+		else System.err.println("Could not stop background server");
 
 		return result;
 	}

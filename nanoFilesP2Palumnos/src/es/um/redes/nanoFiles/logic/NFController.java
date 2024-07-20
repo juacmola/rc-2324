@@ -165,7 +165,7 @@ public class NFController {
 			break;
 		case NFCommands.COM_STOP_SERVER:
 			/*
-			 * Pedir al controllerPeer que pare el servidor en segundo plano (método método
+			 * Pedir al controllerPeer que pare el servidor en segundo plano (método
 			 * stopBackgroundFileServer). A continuación, pedir al controllerDir que
 			 * solicite al directorio darnos de baja como servidor de ficheros (método
 			 * unregisterFileServer).

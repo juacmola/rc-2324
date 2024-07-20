@@ -36,14 +36,15 @@ public class NFServer implements Runnable {
 		while (true) {
 			/* DONE: Usar el socket servidor para esperar conexiones de otros peers que
 			 * soliciten descargar ficheros*/
-			try { socket = serverSocket.accept();
-			System.out.println("\nNew client connected to NFServer: " +
-					socket.getInetAddress().toString() + ":" + socket.getPort());
-//			}catch (SocketTimeoutException e) {
-//				System.err.println("Timeout ocurrence");
+			try { 
+				socket = serverSocket.accept();
+				System.out.println("\nNew client connected to NFServer: " +
+							socket.getInetAddress().toString() + ":" + socket.getPort());
+			}catch (SocketTimeoutException e) {
+				System.err.println("Timeout ocurrence");
 			}catch (IOException e) {
 				System.err.println("There was a problem");
-				e.printStackTrace();
+				break;
 			}
 			
 			/* DONE: Crear un hilo nuevo de la clase NFServerThread, que llevará
@@ -74,7 +75,7 @@ public class NFServer implements Runnable {
 	/** 2) Detener el servidor (stopserver)
 	 * @throws IOException 
 	 */
-	public void stopserver() throws IOException {
+	public void stopServer() throws IOException {
 		this.serverSocket.close();
 	}
 

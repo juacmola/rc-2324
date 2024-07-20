@@ -173,7 +173,7 @@ public class NFControllerLogicP2P {
 	 */
 	public void stopBackgroundFileServer() throws IOException {
 		/*DONE: Enviar señal para detener nuestro servidor de ficheros en segundo plano*/
-		serverSegundoPlano.stopserver();
+		serverSegundoPlano.stopServer();
 	}
 
 }

@@ -279,7 +279,6 @@ public class DirectoryConnector {
 		DirMessage dirMessageFromDirectory = DirMessage.fromString(responseFromDirectory);
 
 		String logoutOp = dirMessageFromDirectory.getOperation();
-		
 		if (logoutOp.equals("logoutOK")) {
 			success = true;
 		}
@@ -307,21 +306,17 @@ public class DirectoryConnector {
 		
 		byte[] requestData = messageToDirectory.getBytes();
 		byte response[] = null;
-		try {
-			response = sendAndReceiveDatagrams(requestData);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		try { response = sendAndReceiveDatagrams(requestData);
+		} catch (IOException e) { e.printStackTrace(); }
 		String responseFromDirectory = new String(response);
 		DirMessage dirMessageFromDirectory = DirMessage.fromString(responseFromDirectory);
 		
 		String confirmation = dirMessageFromDirectory.getOperation();
-		
 		if (confirmation.equals("registerServerOK")) {
 			success = true;
 			System.out.println("File Server was set in port " + serverPort);
 		}else {
-		System.err.println("Couldn't set File Server in port " + serverPort);
+			System.err.println("Couldn't set File Server in port " + serverPort);
 		}
 		
 		return success;
@@ -422,6 +417,37 @@ public class DirectoryConnector {
 
 
 		return nicklist;
+	}
+	
+	/**
+	 * Método para cerrar el servidor en segundo plano del peer
+	 * 
+	 * @return Verdadero si el directorio eliminó el servidor en segundo plano
+	 */
+	public boolean stopBackGroundServer() {
+		// DONE: Ver TODOs en logIntoDirectory y seguir esquema similar
+		boolean success = false;
+		
+		DirMessage dirMessageToDirectory = new DirMessage(DirMessageOps.OPERATION_STOP_SERVER);
+		dirMessageToDirectory.setSessionKey(sessionKey);
+		
+		String messageToDirectory = dirMessageToDirectory.toString();
+		byte[] requestData = messageToDirectory.getBytes();
+		byte response[] = null;
+		try {
+			response = sendAndReceiveDatagrams(requestData);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String responseFromDirectory = new String(response);
+		DirMessage dirMessageFromDirectory = DirMessage.fromString(responseFromDirectory);
+
+		String logoutOp = dirMessageFromDirectory.getOperation();
+		if (logoutOp.equals("stopServerOK")) {
+			success = true;
+		}
+		
+		return success;
 	}
 
 
