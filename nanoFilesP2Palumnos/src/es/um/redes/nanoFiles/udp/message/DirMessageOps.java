@@ -29,6 +29,7 @@ public class DirMessageOps {
 	
 	public static final String OPERATION_GETADDR_FROM_NICK = "getAddrFromNick";
 	public static final String OPERATION_GETADDR_RESP = "getAddrResp";
+	public static final String OPERATION_GETADDR_FAIL = "getAddrFAIL";
 	
 	public static final String NICKNAME_INVALID = "invalid_nickname";
 	public static final int PORT_INVALID = -1;

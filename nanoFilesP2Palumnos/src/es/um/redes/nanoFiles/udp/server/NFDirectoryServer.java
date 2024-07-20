@@ -1,6 +1,7 @@
 package es.um.redes.nanoFiles.udp.server;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream.PutField;
 import java.lang.reflect.Array;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -43,10 +44,14 @@ public class NFDirectoryServer {
 	 * funcionalidad del sistema nanoFilesP2P: ficheros publicados, servidores
 	 * registrados, etc. Luego, inicializarlas.
 	 */
-	private HashMap<Integer, Integer> peers;
+	/**
+	 * Estructura para guardar las claves de sesión y sus puertos asociados
+	 */
+	private HashMap<Integer, Integer> peers;	//SessionKey|PORT
 
-
-
+	private HashMap<String, String> address;	//Nick|IP
+	
+	private String CL="";
 	/**
 	 * Generador de claves de sesión aleatorias (sessionKeys)
 	 */
@@ -70,6 +75,7 @@ public class NFDirectoryServer {
 		this.nicks = new HashMap<>();
 		this.sessionKeys = new HashMap<>();
 		this.peers = new HashMap<>();
+		this.address = new HashMap<>();
 
 		if (NanoFiles.testMode) {
 			if (socket == null || nicks == null || sessionKeys == null) {
@@ -108,8 +114,9 @@ public class NFDirectoryServer {
 					System.exit(-1);
 				}
 			}
-			System.out.println("Directory received datagram from " + clientAddr + " of size " + dataLength + " bytes");
-
+			System.out.println("Directory received datagram from " + clientAddr + " of size " + dataLength + " bytes");	
+			CL = clientAddr.getHostString();
+			
 			if (dataLength > 0) {	// Analizamos la solicitud y la procesamos
 				String messageFromClient = null;
 				
@@ -132,7 +139,6 @@ public class NFDirectoryServer {
 						DatagramPacket packetToClient = new DatagramPacket(dataToClient, dataToClient.length, clientAddr);
 						socket.send(packetToClient);
 					}
-					
 					else
 						System.err.println("The message is not a 'login' message");
 					
@@ -191,7 +197,6 @@ public class NFDirectoryServer {
 		switch (operation) {
 			case DirMessageOps.OPERATION_LOGIN: {
 				String username = msg.getNickname();
-
 				/*
 				 * DONE: Comprobamos si tenemos dicho usuario registrado (atributo "nicks"). Si
 				 * no está, generamos su sessionKey (número aleatorio entre 0 y 1000) y añadimos
@@ -212,6 +217,7 @@ public class NFDirectoryServer {
 				}
 			
 				else {
+					address.put(username, CL);
 					int sessionKey = random.nextInt(10001);
 					nicks.put(username, sessionKey);
 					sessionKeys.put(sessionKey, username);
@@ -284,15 +290,37 @@ public class NFDirectoryServer {
 			}
 			
 			case DirMessageOps.OPERATION_STOP_SERVER: {
-				
 				if (peers.containsKey(msg.getSessionKey())) {
 					peers.remove(msg.getSessionKey());
 					response = new DirMessage(DirMessageOps.OPERATION_STOP_SERVER_OK);
 				}
-				else {
-					response = new DirMessage(DirMessageOps.OPERATION_STOP_SERVER_FAIL);
-				}
+				else response = new DirMessage(DirMessageOps.OPERATION_STOP_SERVER_FAIL);
 			
+				/*
+				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
+				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
+				 * servidor
+				 */
+				System.out.print("operation:" + response.getOperation() + "\n\n");
+				break;
+			}
+			
+			case DirMessageOps.OPERATION_GETADDR_FROM_NICK:{
+				String nick = msg.getNickname();
+				try{
+					int sessionKey = nicks.get(nick);
+					
+						String ip = address.get(nick);
+						int port = peers.get(sessionKey);
+						
+						response = new DirMessage(DirMessageOps.OPERATION_GETADDR_RESP);
+						response.setIP(ip);
+						response.setPort(port);
+				}catch (Exception e) {
+					response = new DirMessage(DirMessageOps.OPERATION_GETADDR_FAIL);
+				}
+				
+				
 				/*
 				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
 				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el

@@ -109,7 +109,7 @@ public class DirectoryConnector {
 		/* NOTA: Las excepciones deben tratarse de la más concreta a la más genérica.
 		 * SocketTimeoutException es más concreta que IOException.*/
 		
-		socket.setSoTimeout(TIMEOUT);	
+//		socket.setSoTimeout(TIMEOUT);	
 		while(!paqueteRecibido && numeroIntentos < MAX_NUMBER_OF_ATTEMPTS) {
 	
 			try{
@@ -351,10 +351,9 @@ public class DirectoryConnector {
 			DirMessage dirMessageFromDirectory = DirMessage.fromString(responseFromDirectory);
 			
 			String confirmation = dirMessageFromDirectory.getOperation();
-			String address = dirMessageFromDirectory.getIP();
-			int port = dirMessageFromDirectory.getPort();
-			
 			if (confirmation.equals("getAddrResp") ) {
+				String address = dirMessageFromDirectory.getIP();
+				int port = dirMessageFromDirectory.getPort();
 				InetAddress ip = InetAddress.getByName(address);
 				serverAddr = new InetSocketAddress(ip, port);
 				System.out.println("The address sent by Directory is " + ip + ":" + port);

@@ -164,10 +164,10 @@ public class DirMessage {
 				break;
 			}
 			
-//			case FIELDNAME_IP:{
-//				m.ip = value;
-//				break;
-//			}
+			case FIELDNAME_IP:{
+				m.ip = value;
+				break;
+			}
 
 
 
@@ -231,15 +231,16 @@ public class DirMessage {
 				break;
 			}
 			
-			//TODO: Pensar que tiene que devolver. Yo creo que así está bien
 			case DirMessageOps.OPERATION_REGISTER_SERVER_OK:
 			case DirMessageOps.OPERATION_STOP_SERVER_OK:
-			case DirMessageOps.OPERATION_STOP_SERVER_FAIL:{}
+			case DirMessageOps.OPERATION_STOP_SERVER_FAIL:
+			case DirMessageOps.OPERATION_GETADDR_FAIL:{ break; }
 			
-//			case DirMessageOps.OPERATION_GETADDR_RESP:{
-//				sb.append(FIELDNAME_IP + DELIMITER + ip + END_LINE);
-//				sb.append(FIELDNAME_PORT + DELIMITER + port + END_LINE);
-//			}
+			case DirMessageOps.OPERATION_GETADDR_RESP:{
+				sb.append(FIELDNAME_IP + DELIMITER + ip + END_LINE);
+				sb.append(FIELDNAME_PORT + DELIMITER + port + END_LINE);
+				break;
+			}
 		
 		}
 

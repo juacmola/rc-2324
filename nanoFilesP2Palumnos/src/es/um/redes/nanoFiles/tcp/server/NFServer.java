@@ -1,28 +1,50 @@
 package es.um.redes.nanoFiles.tcp.server;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.Random;
 
 /**
  * Servidor que se ejecuta en un hilo propio. Creará objetos
  * {@link NFServerThread} cada vez que se conecte un cliente.
  */
 public class NFServer implements Runnable {
-	private int PORT = 5000;
+	private int PORT = 0;
 	private ServerSocket serverSocket = null;
 	private boolean stopServer = false;
-	private static final int SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS = 1000;
+//	private static final int SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS = 1000;
+	private static final int MAX_PORT_ATTEMPTS = 5; // Number of attempts to find an available port
 	private NFServerThread st = null;
 
 	public NFServer() throws IOException {
+		Random random = new Random();
+		int port = random.nextInt(10000) + 1;
+		boolean portAssigned = false;
+		
 		/* DONE: Crear un socket servidor y ligarlo a cualquier puerto disponible*/
-		serverSocket = new ServerSocket();
-//		serverSocket.setSoTimeout(SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS);	//No descomentarlo hasta probar que funciona
-		InetSocketAddress serverSocketAddress = new InetSocketAddress(PORT);
-		serverSocket.bind(serverSocketAddress);
+		for (int i = 0; i < MAX_PORT_ATTEMPTS; i++) {
+			try{
+				InetSocketAddress serverSocketAddress = new InetSocketAddress(port);
+				serverSocket = new ServerSocket();
+//				serverSocket.setSoTimeout(SERVERSOCKET_ACCEPT_TIMEOUT_MILISECS);	//No descomentarlo hasta probar que funciona
+				serverSocket.bind(serverSocketAddress);
+				portAssigned = true;
+				PORT = port;
+				break;
+			}catch (BindException e) {
+			// Puerto ocupado, prueba con el siguiente
+				System.err.println("Port " + port + " is not available.");
+				port = random.nextInt(10000) + 1;
+			}
+		}
+		
+		if (!portAssigned) {
+    	throw new IOException("Failed to assign a port for the server after " + MAX_PORT_ATTEMPTS + " attempts.");
+		}
 	}
 
 	/**
@@ -44,7 +66,7 @@ public class NFServer implements Runnable {
 				System.err.println("Timeout ocurrence");
 			}catch (IOException e) {
 				if (stopServer) System.out.println("Server stopped.");	// El servidor fue detenido intencionalmente
-      else System.err.println("There was a problem: " + e.getMessage()); // Ocurrió un error inesperado
+				else System.err.println("There was a problem: " + e.getMessage()); // Ocurrió un error inesperado
       
       break;
 			}

@@ -200,7 +200,7 @@ public class NFControllerLogicDir {
 		try {
 			serverAddr = directoryConnector.lookupServerAddrByUsername(nickname);
 		} catch (UnknownHostException e) {
-			System.err.println("There was an error sending the IP");
+			System.err.println("There was an error finding peer");
 			e.printStackTrace();
 		}
 
