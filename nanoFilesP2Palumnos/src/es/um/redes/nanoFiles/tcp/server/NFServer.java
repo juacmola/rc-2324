@@ -33,7 +33,7 @@ public class NFServer implements Runnable {
 	 */
 	public void run() {
 		Socket socket = null;
-		while (true) {
+		while (!stopServer) {
 			/* DONE: Usar el socket servidor para esperar conexiones de otros peers que
 			 * soliciten descargar ficheros*/
 			try { 
@@ -43,8 +43,10 @@ public class NFServer implements Runnable {
 			}catch (SocketTimeoutException e) {
 				System.err.println("Timeout ocurrence");
 			}catch (IOException e) {
-				System.err.println("There was a problem");
-				break;
+				if (stopServer) System.out.println("Server stopped.");	// El servidor fue detenido intencionalmente
+      else System.err.println("There was a problem: " + e.getMessage()); // Ocurrió un error inesperado
+      
+      break;
 			}
 			
 			/* DONE: Crear un hilo nuevo de la clase NFServerThread, que llevará
@@ -76,7 +78,10 @@ public class NFServer implements Runnable {
 	 * @throws IOException 
 	 */
 	public void stopServer() throws IOException {
-		this.serverSocket.close();
+		stopServer = true;
+		if (serverSocket != null && !serverSocket.isClosed()) {
+      serverSocket.close();
+		}
 	}
 
 	/** 3) Obtener el puerto de escucha del servidor
