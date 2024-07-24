@@ -156,7 +156,6 @@ public class NFControllerLogicDir {
 		boolean result = false;
 
 		if (directoryConnector.registerServerPort(serverPort)) result = true;
-		System.out.println("*****FUNCIONA!!!!!*****");
 		return result;
 	}
 

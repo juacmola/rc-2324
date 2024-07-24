@@ -317,6 +317,7 @@ public class DirectoryConnector {
 			System.out.println("File Server was set in port " + serverPort);
 		}else {
 			System.err.println("Couldn't set File Server in port " + serverPort);
+			success=false;
 		}
 		
 		return success;
