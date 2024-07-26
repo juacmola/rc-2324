@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.sound.midi.SysexMessage;
@@ -233,8 +234,9 @@ public class DirectoryConnector {
 	 * @return La lista de nombres de usuario registrados, o null si el directorio
 	 *         no pudo satisfacer nuestra solicitud
 	 */
-	public String[] getUserList() {
-		String[] userlist = null;
+	public ArrayList<String> getUserList() {
+		ArrayList<String> userlist = null;
+		ArrayList<String> isPeerList = null;
 		// DONE: Ver TODOs en logIntoDirectory y seguir esquema similar
 		DirMessage dirMessageToDirectory = new DirMessage(DirMessageOps.OPERATION_REGISTERED_USERS);
 		dirMessageToDirectory.setSessionKey(sessionKey);
@@ -248,11 +250,17 @@ public class DirectoryConnector {
 		}
 		String responseFromDirectory = new String(response);
 		DirMessage dirMessageFromDirectory = DirMessage.fromString(responseFromDirectory);
-		userlist = dirMessageFromDirectory.getUsersList().toArray(new String[dirMessageFromDirectory.getUsersList().size()]);
+		userlist = dirMessageFromDirectory.getUsersList();
+		isPeerList = dirMessageFromDirectory.getIsPeerList();
 		
-		if (userlist.length == 0)
+		if (userlist.size() == 0)
 			userlist = null;
 
+		for (int i=0; i< userlist.size(); i++) {
+			System.out.println("user:" + userlist.get(i));
+			System.out.println("peer:" + isPeerList.get(i));
+		}
+		
 		return userlist;
 	}
 

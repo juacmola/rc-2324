@@ -7,10 +7,12 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 
 import es.um.redes.nanoFiles.application.NanoFiles;
@@ -237,7 +239,15 @@ public class NFDirectoryServer {
 			
 			case DirMessageOps.OPERATION_REGISTERED_USERS: {
 				response = new DirMessage(DirMessageOps.OPERATION_REGISTERED_USERS_RESP);
-				response.setUsersList(nicks);
+				ArrayList<String> usuarios = new ArrayList<>();
+				ArrayList<String> isPeerList = new ArrayList<>();
+				for (Map.Entry<String, Integer> entry : nicks.entrySet()) {
+					usuarios.add(entry.getKey());
+					if(peers.containsKey(entry.getValue())) isPeerList.add("true");
+					else isPeerList.add("false");
+				}
+				response.setUsersList(usuarios);
+				response.setIsPeer(isPeerList);
 				
 				/*
 				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
@@ -245,8 +255,9 @@ public class NFDirectoryServer {
 				 * servidor
 				 */
 				System.out.println("operation:" + response.getOperation());
-				for (String user : response.getUsersList())
-					System.out.println("user:" + user);
+				System.out.println("Arreglad lo que escribe el directorio una vez acaba userlist");
+//				for (int i=0; i< response.getUsersList().size(); i++)
+//					System.out.println("user:" + userlist.get(i));
 				
 				System.out.println();
 				break;

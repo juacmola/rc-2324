@@ -1,9 +1,11 @@
 package es.um.redes.nanoFiles.udp.message;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 
@@ -35,7 +37,7 @@ public class DirMessage {
 	private static final String FIELDNAME_USER = "user";
 	private static final String FIELDNAME_PORT = "port";
 	private static final String FIELDNAME_IP = "ip";
-
+	private static final String FIELDNAME_PEER = "peer";
 
 	/**
 	 * Tipo del mensaje, de entre los tipos definidos en PeerMessageOps.
@@ -49,8 +51,8 @@ public class DirMessage {
 	private int sessionKey = DirMessageOps.SESSIONKEY_INVALID;
 	private int port = DirMessageOps.PORT_INVALID;
 	private String ip = DirMessageOps.IP_INVALID;
-	private HashSet<String> usersList = new HashSet<>();
-
+	private ArrayList<String> usersList = new ArrayList<>();
+	private ArrayList<String> isPeerList = new ArrayList<>();
 
 
 
@@ -76,8 +78,8 @@ public class DirMessage {
 		return sessionKey;
 	}
 	
-	public Set<String> getUsersList() {
-		return Collections.unmodifiableSet(usersList);
+	public ArrayList<String> getUsersList() {
+		return usersList;
 	}
 	
 	public int getPort() {
@@ -86,6 +88,10 @@ public class DirMessage {
 	
 	public String getIP() {
 		return ip;
+	}
+	
+	public ArrayList<String> getIsPeerList() {
+		return isPeerList;
 	}
 	
 	//Setters
@@ -97,8 +103,8 @@ public class DirMessage {
 		this.sessionKey = sessionKey;
 	}
 	
-	public void setUsersList(HashMap<String, Integer> nicks) {
-		this.usersList.addAll(nicks.keySet());
+	public void setUsersList(ArrayList<String> nicks) {
+		this.usersList = nicks;
 	}
 	
 	public void setPort(int port) {
@@ -108,7 +114,10 @@ public class DirMessage {
 	public void setIP(String address) {
 		this.ip = address;
 	}
-
+	
+	public void setIsPeer(ArrayList<String> bool) {
+		this.isPeerList = bool;
+	}
 
 
 	/**
@@ -168,7 +177,11 @@ public class DirMessage {
 				m.ip = value;
 				break;
 			}
-
+			
+			case FIELDNAME_PEER:{
+				m.isPeerList.add(value);
+				break;
+			}
 
 
 			default:
@@ -219,9 +232,10 @@ public class DirMessage {
 			}
 			
 			case DirMessageOps.OPERATION_REGISTERED_USERS_RESP: {
-				for (String user : usersList)
-					sb.append(FIELDNAME_USER + DELIMITER + user + END_LINE);
-				
+				for (int i=0; i< usersList.size(); i++) {
+					sb.append(FIELDNAME_USER + DELIMITER + usersList.get(i) + END_LINE);
+					sb.append(FIELDNAME_PEER + DELIMITER + isPeerList.get(i) + END_LINE);
+				}
 				break;
 			}
 			

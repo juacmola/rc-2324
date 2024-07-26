@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
@@ -105,18 +106,18 @@ public class NFControllerLogicDir {
 		 * e imprimirla por pantalla. Devolver éxito/fracaso de la operación.
 		 */
 		boolean result = false;
-		
-		String[] userList = directoryConnector.getUserList();
-		
-		if (userList != null) {
-			for (String user : userList)
-				System.out.println("user:" + user);
-		
+		ArrayList<String> userList = null;
+		try{
+			userList = directoryConnector.getUserList();
+//			for (int i=0; i< userList.size(); i++) {
+//				System.out.println("user:" + userList.get(i));
+//				System.out.println("peer:" + isPeerList.get(i));
+//			}
 			result = true;
+		}catch (NullPointerException e) {
+			System.err.println("There are no users using NanoFiles."); 
+			result = false;
 		}
-		else
-			System.err.println("The directory wasn't able to provide the list of users.");
-
 		return result;
 	}
 

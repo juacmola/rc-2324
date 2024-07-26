@@ -253,7 +253,6 @@ public class NFController {
 				break;
 			}
 			//Case generalizado para todos los mensajes que no suponen un cambio de estado en el autómata y que solo se pueden ejecutar si estás logueado en el directorio.
-			case NFCommands.COM_USERLIST:
 			case NFCommands.COM_DOWNLOADFROM:
 			case NFCommands.COM_FGSERVE:
 			case NFCommands.COM_BGSERVE: {
