@@ -17,7 +17,7 @@ public class NFController {
 	 */
 	private static final byte LOGGED_OUT = 0;
 	private static final byte LOGGED_IN = 1;
-	//private static final byte SERVER = 1;
+	private static final byte SERVER = 2;
 	/*
 	 * TODO: Añadir más constantes que representen los estados del autómata del
 	 * cliente de directorio.
@@ -262,6 +262,24 @@ public class NFController {
 				}
 				break;
 			}
+			
+			case NFCommands.COM_FILELIST:
+			case NFCommands.COM_SEARCH: {
+				if (currentState != LOGGED_IN && currentState != SERVER) {
+					commandAllowed = false;
+					System.err.println("*You cannot run this command because you are not logged into the directory");
+				}
+				break;
+			}
+			
+			
+			case NFCommands.COM_PUBLISH:{
+				if (currentState != SERVER) {
+					commandAllowed = false;
+					System.err.println("*You cannot run this command because you are not a peer");
+				}
+				break;
+			}
 
 		default:
 			// System.err.println("ERROR: undefined behaviour for " + currentCommand + "
@@ -290,10 +308,10 @@ public class NFController {
 				break;
 			}
 		
-//			case NFCommands.COM_FGSERVE:{
-//				currentState = SERVER;
-//				break;
-//			}	
+			case NFCommands.COM_BGSERVE:{
+				currentState = SERVER;
+				break;
+			}	
 //			
 //			case NFServerSimple.STOP_SERVER_COMMAND:{
 //				

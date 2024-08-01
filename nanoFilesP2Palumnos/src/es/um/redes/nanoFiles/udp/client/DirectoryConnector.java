@@ -383,11 +383,29 @@ public class DirectoryConnector {
 	 */
 	public boolean publishLocalFiles(FileInfo[] files) {
 		boolean success = false;
+		// DONE: Ver TODOs en logIntoDirectory y seguir esquema similar
 
-		// TODO: Ver TODOs en logIntoDirectory y seguir esquema similar
+		DirMessage dirMessageToDirectory = new DirMessage(DirMessageOps.OPERATION_PUBLISH);
+		dirMessageToDirectory.setSessionKey(sessionKey);
+		dirMessageToDirectory.setPublishFiles(files);
+		dirMessageToDirectory.setNumFiles(files.length);
+		
+		String messageToDirectory = dirMessageToDirectory.toString();
+		byte[] requestData = messageToDirectory.getBytes();
+		byte response[] = null;
+		try {
+			response = sendAndReceiveDatagrams(requestData);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String responseFromDirectory = new String(response);
+		DirMessage dirMessageFromDirectory = DirMessage.fromString(responseFromDirectory);
 
-
-
+		String confirmation = dirMessageFromDirectory.getOperation();
+		if (confirmation.equals("publishOK")) {
+			success = true;
+		}
+		
 		return success;
 	}
 
@@ -402,10 +420,26 @@ public class DirectoryConnector {
 	 */
 	public FileInfo[] getFileList() {
 		FileInfo[] filelist = null;
-		// TODO: Ver TODOs en logIntoDirectory y seguir esquema similar
+		// DONE: Ver TODOs en logIntoDirectory y seguir esquema similar
+		DirMessage dirMessageToDirectory = new DirMessage(DirMessageOps.OPERATION_GET_FILE_LIST);
+		dirMessageToDirectory.setSessionKey(sessionKey);
 
-
-
+		String messageToDirectory = dirMessageToDirectory.toString();
+		byte[] requestData = messageToDirectory.getBytes();
+		byte response[] = null;
+		try {
+			response = sendAndReceiveDatagrams(requestData);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String responseFromDirectory = new String(response);
+		DirMessage dirMessageFromDirectory = DirMessage.fromString(responseFromDirectory);
+		
+		String confirmation = dirMessageFromDirectory.getOperation();
+		if (confirmation.equals("getFileListResp") ) {
+			filelist = dirMessageFromDirectory.getPublishedFiles();
+		}
+		
 		return filelist;
 	}
 
@@ -421,8 +455,25 @@ public class DirectoryConnector {
 	public String[] getServerNicknamesSharingThisFile(String fileHash) {
 		String[] nicklist = null;
 		// TODO: Ver TODOs en logIntoDirectory y seguir esquema similar
+		DirMessage dirMessageToDirectory = new DirMessage(DirMessageOps.OPERATION_GET_SEARCHED);
+		dirMessageToDirectory.setSessionKey(sessionKey);
+		dirMessageToDirectory.setFileHash(fileHash);
 
-
+		String messageToDirectory = dirMessageToDirectory.toString();
+		byte[] requestData = messageToDirectory.getBytes();
+		byte response[] = null;
+		try {
+			response = sendAndReceiveDatagrams(requestData);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String responseFromDirectory = new String(response);
+		DirMessage dirMessageFromDirectory = DirMessage.fromString(responseFromDirectory);
+		
+		String confirmation = dirMessageFromDirectory.getOperation();
+		if (confirmation.equals("getSearchedResp") ) {
+			nicklist = dirMessageFromDirectory.getFileServer().toArray(new String[0]);
+		}
 
 		return nicklist;
 	}

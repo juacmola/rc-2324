@@ -114,6 +114,7 @@ public class NFControllerLogicDir {
 //				System.out.println("peer:" + isPeerList.get(i));
 //			}
 			result = true;
+			
 		}catch (NullPointerException e) {
 			System.err.println("There are no users using NanoFiles."); 
 			result = false;
@@ -127,16 +128,32 @@ public class NFControllerLogicDir {
 	 */
 	protected boolean getAndPrintFileList() {
 		/*
-		 * TODO: Obtener la lista de ficheros servidos. Comunicarse con el directorio (a
+		 * DONE: Obtener la lista de ficheros servidos. Comunicarse con el directorio (a
 		 * través del directoryConnector) para obtener la lista de ficheros e imprimirla
 		 * por pantalla (método FileInfo.printToSysout). Devolver éxito/fracaso de la
 		 * operación.
 		 */
 		boolean result = false;
-
-
-
+		FileInfo[] files = null;		
+		
+		files = directoryConnector.getFileList();
+		if (files != null){
+			FileInfo.printToSysoutFileList(files);
+			result = true;
+		}else {
+			System.out.println("There are no files published."); 
+			result = false;
+		}
+		
 		return result;
+//		try {
+//			files = directoryConnector.getFileList();
+////			FileInfo.printToSysout(files);
+//			return result = true;
+//		}catch (NullPointerException e) {
+//				System.out.println("There are no files published."); 
+//				return result = false;
+//		}
 	}
 
 	/**
@@ -167,7 +184,7 @@ public class NFControllerLogicDir {
 	 */
 	protected boolean publishLocalFiles() {
 		/*
-		 * TODO: Comunicarse con el directorio (a través del directoryConnector) para
+		 * DONE: Comunicarse con el directorio (a través del directoryConnector) para
 		 * enviar la lista de ficheros servidos por este peer. Los ficheros de la
 		 * carpeta local compartida están disponibles en NanoFiles.db). Se debe enviar
 		 * la clave de sesión para identificarse. Devolver éxito/fracaso de la
@@ -175,8 +192,13 @@ public class NFControllerLogicDir {
 		 */
 		boolean result = false;
 
+		FileInfo[] files = NanoFiles.db.getFiles();
 
-
+		result = directoryConnector.publishLocalFiles(files);
+		
+		if (result) System.out.println("The files were published");
+		else System.err.println("Couldn not publish your files");
+		
 		return result;
 	}
 
@@ -258,15 +280,25 @@ public class NFControllerLogicDir {
 	 *                          pregunta
 	 */
 	public boolean getAndPrintServersNicknamesSharingThisFile(String fileHashSubstring) {
-		/*
-		 * TODO: Comunicarse con el directorio (a través del directoryConnector) para
+		/* DONE: Comunicarse con el directorio (a través del directoryConnector) para
 		 * preguntar por aquellos servidores que están sirviendo un determinado fichero,
 		 * y obtener una lista con sus nicknames. Devolver éxito/fracaso de la
 		 * operación.
 		 */
 		boolean result = false;
-
-
+		String[] servers= null;		
+		
+		servers = directoryConnector.getServerNicknamesSharingThisFile(fileHashSubstring);
+		if (servers != null){
+			System.out.print("Lista de servidores que comparten dicho hash: ");
+			for (String str : servers) {
+        System.out.println(str + ", ");
+			}
+			result = true;
+		}else {
+			System.out.println("This file was nos published yet"); 
+			result = false;
+		}
 
 		return result;
 	}
@@ -307,7 +339,7 @@ public class NFControllerLogicDir {
 	 * @return Éxito o fracaso de la operación
 	 */
 	public boolean unregisterFileServer() {
-		/*TODO: Comunicarse con el directorio (a través del directoryConnector) para
+		/*DONE: Comunicarse con el directorio (a través del directoryConnector) para
 		 * darse de baja como servidor de ficheros. Se debe enviar la clave de sesión
 		 * para identificarse.
 		 */

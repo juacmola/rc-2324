@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -51,7 +52,17 @@ public class NFDirectoryServer {
 	 */
 	private HashMap<Integer, Integer> peers;	//SessionKey|PORT
 
+	/**
+	 * Estructura para guardar los nicknames con sus direcciones IP
+	 */
 	private HashMap<String, String> address;	//Nick|IP
+	
+	/**
+	 * Estructura para guardar los ficheros publicados por cada servidor
+	 */
+	private HashMap<Integer, List<FileInfo>> published;
+	
+	private HashMap<String, List<String>> searched;
 	
 	private String CL="";
 	/**
@@ -78,6 +89,8 @@ public class NFDirectoryServer {
 		this.sessionKeys = new HashMap<>();
 		this.peers = new HashMap<>();
 		this.address = new HashMap<>();
+		this.published = new HashMap<>();
+		this.searched = new HashMap<>();
 
 		if (NanoFiles.testMode) {
 			if (socket == null || nicks == null || sessionKeys == null) {
@@ -340,8 +353,76 @@ public class NFDirectoryServer {
 				System.out.print("operation:" + response.getOperation() + "\n\n");
 				break;
 			}
+			
+			case DirMessageOps.OPERATION_PUBLISH:{
+				int sessionKey = msg.getSessionKey();
+//				int numFiles = msg.getNumFiles();
+				
+				FileInfo[] files = msg.getPublishedFiles();
+				for (FileInfo file : files) {
+					published.computeIfAbsent(sessionKey, k -> new ArrayList<>()).add(file);
+					searched.computeIfAbsent(file.getHash(), k -> new ArrayList<>()).add(sessionKeys.get(sessionKey));
+				}
+				
+				FileInfo.printToSysout(files);
+							
+				response = new DirMessage(DirMessageOps.OPERATION_PUBLISH_OK);
+				
+				/*
+				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
+				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
+				 * servidor
+				 */
+				System.out.print("operation:" + response.getOperation() + "\n\n");
+				break;
+			}
 
+			case DirMessageOps.OPERATION_GET_FILE_LIST:{
+				if (published.isEmpty()) response = new DirMessage(DirMessageOps.OPERATION_FILE_LIST_FAIL);
+				else {
+					String totalFiles = "";
+					int numFiles = 0;
+					for (Map.Entry<Integer, List<FileInfo>> entryFiles : published.entrySet()) {
+						for (FileInfo entryFile : entryFiles.getValue()) {
+							totalFiles = totalFiles + entryFile.toFileList(sessionKeys.get(entryFiles.getKey())) + ",";
+							numFiles++;
+						}
+					}
+					System.out.println(totalFiles);
+					response = new DirMessage(DirMessageOps.OPERATION_FILE_LIST_RESP);
+					response.setFilesInString(totalFiles);
+					response.setNumFiles(numFiles);
+				}
+				
+				
+				/*
+				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
+				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
+				 * servidor
+				 */
+				System.out.print("operation:" + response.getOperation() + "\n\n");
+				break;
+			}
+			
+			case DirMessageOps.OPERATION_GET_SEARCHED:{
+				String fileHash = msg.getFileHash();
+				ArrayList<String> servers = null;
+				
+				if (searched.isEmpty() || !searched.containsKey(fileHash)) response = new DirMessage(DirMessageOps.OPERATION_SEARCHED_FAIL);
+				else{
+					servers = (ArrayList<String>) searched.get(fileHash);
+					response = new DirMessage(DirMessageOps.OPERATION_SEARCHED_RESP);
+					response.setFileServer(servers);
+				}
 
+				/*
+				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
+				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
+				 * servidor
+				 */
+				System.out.print("operation:" + response.getOperation() + "\n\n");
+				break;
+			}
 
 			default:
 				System.out.println("Unexpected message operation: \"" + operation + "\"");

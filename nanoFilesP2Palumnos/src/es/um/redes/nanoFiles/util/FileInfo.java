@@ -1,6 +1,7 @@
 package es.um.redes.nanoFiles.util;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -12,6 +13,7 @@ public class FileInfo {
 	public String fileHash;
 	public String fileName;
 	public String filePath;
+	public String fileNick;
 	public long fileSize = -1;
 
 	public FileInfo(String hash, String name, long size, String path) {
@@ -24,6 +26,63 @@ public class FileInfo {
 	public FileInfo() {
 	}
 
+	public void setNick(String nick) {
+		this.fileNick = nick;
+	}
+	
+	public String getHash() {
+		return fileHash;
+	}
+	
+	public String toPublish() {
+		StringBuffer strBuf = new StringBuffer();
+		strBuf.append(fileName);
+		strBuf.append("+");
+		strBuf.append(fileSize);
+		strBuf.append("+");
+		strBuf.append(fileHash);
+		return strBuf.toString();
+	}
+	
+	public String toFileList(String nick) {
+		StringBuffer strBuf = new StringBuffer();
+		strBuf.append(fileName);
+		strBuf.append("+");
+		strBuf.append(fileSize);
+		strBuf.append("+");
+		strBuf.append(fileHash);
+		strBuf.append("+");
+		strBuf.append(nick);
+		return strBuf.toString();
+	}
+	
+	public static FileInfo[] fromPublish(String buff, int numFiles) {
+		if (buff.endsWith(",")) buff = buff.substring(0, buff.length() - 1);
+		
+		FileInfo[] files = new FileInfo[numFiles];
+		String[] entries = buff.split(","); // Posición del delimitador
+		
+		for (int i=0; i<numFiles; i++) {
+			String[] parts = entries[i].split("\\+");
+			files[i] = new FileInfo(parts[2], parts[0], Long.parseLong(parts[1]) , "");
+		}
+		return files;
+	}
+	
+	public static FileInfo[] fromFileList(String buff, int numFiles) {
+		if (buff.endsWith(",")) buff = buff.substring(0, buff.length() - 1);
+		
+		FileInfo[] files = new FileInfo[numFiles];
+		String[] entries = buff.split(","); // Posición del delimitador
+		
+		for (int i=0; i<numFiles; i++) {
+			String[] parts = entries[i].split("\\+");
+			files[i] = new FileInfo(parts[2], parts[0], Long.parseLong(parts[1]) , "");
+			files[i].setNick(parts[3]);
+		}
+		return files;
+	}
+	
 	public String toString() {
 		StringBuffer strBuf = new StringBuffer();
 
@@ -41,6 +100,18 @@ public class FileInfo {
 		System.out.println(strBuf);
 		for (FileInfo file : files) {
 			System.out.println(file);
+		}
+	}
+	
+	public static void printToSysoutFileList(FileInfo[] files) {
+		StringBuffer strBuf = new StringBuffer();
+		strBuf.append(String.format("%1$-30s", "Name"));
+		strBuf.append(String.format("%1$10s", "Size"));
+		strBuf.append(String.format(" %1$-45s", "Hash"));
+		strBuf.append(String.format("%1$10s", "Nickname del servidor"));
+		System.out.println(strBuf);
+		for (FileInfo file : files) {
+			System.out.println(file + file.fileNick);
 		}
 	}
 
