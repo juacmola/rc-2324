@@ -60,9 +60,12 @@ public class NFDirectoryServer {
 	/**
 	 * Estructura para guardar los ficheros publicados por cada servidor
 	 */
-	private HashMap<Integer, List<FileInfo>> published;
+	private HashMap<Integer, List<FileInfo>> published;	//sessionKey|File
 	
-	private HashMap<String, List<String>> searched;
+	/**
+	 * Estructura para guardar los nick que tienen un archivo
+	 */
+	private HashMap<String, List<String>> searched;	//Hash|Nick
 	
 	private String CL="";
 	/**
@@ -316,6 +319,7 @@ public class NFDirectoryServer {
 			case DirMessageOps.OPERATION_STOP_SERVER: {
 				if (peers.containsKey(msg.getSessionKey())) {
 					peers.remove(msg.getSessionKey());
+					published.remove(msg.getSessionKey());			
 					response = new DirMessage(DirMessageOps.OPERATION_STOP_SERVER_OK);
 				}
 				else response = new DirMessage(DirMessageOps.OPERATION_STOP_SERVER_FAIL);
@@ -359,14 +363,17 @@ public class NFDirectoryServer {
 //				int numFiles = msg.getNumFiles();
 				
 				FileInfo[] files = msg.getPublishedFiles();
-				for (FileInfo file : files) {
-					published.computeIfAbsent(sessionKey, k -> new ArrayList<>()).add(file);
-					searched.computeIfAbsent(file.getHash(), k -> new ArrayList<>()).add(sessionKeys.get(sessionKey));
+				if (files==null) response = new DirMessage(DirMessageOps.OPERATION_PUBLISH_FAIL);
+				else {
+					for (FileInfo file : files) {
+						published.computeIfAbsent(sessionKey, k -> new ArrayList<>()).add(file);
+						searched.computeIfAbsent(file.getHash(), k -> new ArrayList<>()).add(sessionKeys.get(sessionKey));
+					}
+
+					FileInfo.printToSysout(files);
+
+					response = new DirMessage(DirMessageOps.OPERATION_PUBLISH_OK);
 				}
-				
-				FileInfo.printToSysout(files);
-							
-				response = new DirMessage(DirMessageOps.OPERATION_PUBLISH_OK);
 				
 				/*
 				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida

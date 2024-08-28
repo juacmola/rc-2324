@@ -193,11 +193,13 @@ public class NFControllerLogicDir {
 		boolean result = false;
 
 		FileInfo[] files = NanoFiles.db.getFiles();
-
-		result = directoryConnector.publishLocalFiles(files);
-		
-		if (result) System.out.println("The files were published");
-		else System.err.println("Couldn not publish your files");
+		if (files.length == 0) System.err.println("No files found in folder nf-shared");
+		else {
+			result = directoryConnector.publishLocalFiles(files);
+			
+			if (result) System.out.println("The files were published");
+			else System.err.println("Could not publish your files");
+		}
 		
 		return result;
 	}

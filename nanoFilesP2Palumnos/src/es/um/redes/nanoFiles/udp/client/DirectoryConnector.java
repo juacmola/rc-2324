@@ -239,7 +239,6 @@ public class DirectoryConnector {
 		ArrayList<String> isPeerList = null;
 		// DONE: Ver TODOs en logIntoDirectory y seguir esquema similar
 		DirMessage dirMessageToDirectory = new DirMessage(DirMessageOps.OPERATION_REGISTERED_USERS);
-		dirMessageToDirectory.setSessionKey(sessionKey);
 		String messageToDirectory = dirMessageToDirectory.toString();
 		byte[] requestData = messageToDirectory.getBytes();
 		byte response[] = null;
@@ -422,8 +421,6 @@ public class DirectoryConnector {
 		FileInfo[] filelist = null;
 		// DONE: Ver TODOs en logIntoDirectory y seguir esquema similar
 		DirMessage dirMessageToDirectory = new DirMessage(DirMessageOps.OPERATION_GET_FILE_LIST);
-		dirMessageToDirectory.setSessionKey(sessionKey);
-
 		String messageToDirectory = dirMessageToDirectory.toString();
 		byte[] requestData = messageToDirectory.getBytes();
 		byte response[] = null;

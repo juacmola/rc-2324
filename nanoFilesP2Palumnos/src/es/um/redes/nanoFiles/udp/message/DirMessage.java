@@ -39,7 +39,7 @@ public class DirMessage {
 	private static final String FIELDNAME_USER = "user";
 	private static final String FIELDNAME_PORT = "port";
 	private static final String FIELDNAME_IP = "ip";
-	private static final String FIELDNAME_PEER = "peer";
+	private static final String FIELDNAME_PEER = "isPeer";
 	private static final String FIELDNAME_PUBLISH = "publish";
 	private static final String FIELDNAME_NUM_FILES = "numFiles";
 	private static final String FIELDNAME_PUBLISHED = "published";
@@ -232,10 +232,8 @@ public class DirMessage {
 				break;
 			}
 			
-			case DirMessageOps.OPERATION_REGISTERED_USERS:
 			case DirMessageOps.OPERATION_LOGOUT:
-			case DirMessageOps.OPERATION_STOP_SERVER:
-			case DirMessageOps.OPERATION_GET_FILE_LIST:{
+			case DirMessageOps.OPERATION_STOP_SERVER:{
 				sb.append(FIELDNAME_SESSIONKEY + DELIMITER + sessionKey + END_LINE);
 				break;
 			}
@@ -254,6 +252,10 @@ public class DirMessage {
 				break;
 			}
 			
+			case DirMessageOps.OPERATION_GET_FILE_LIST:
+			case DirMessageOps.OPERATION_PUBLISH_OK:
+			case DirMessageOps.OPERATION_PUBLISH_FAIL:
+			case DirMessageOps.OPERATION_REGISTERED_USERS:
 			case DirMessageOps.OPERATION_REGISTER_SERVER_OK:
 			case DirMessageOps.OPERATION_STOP_SERVER_OK:
 			case DirMessageOps.OPERATION_STOP_SERVER_FAIL:

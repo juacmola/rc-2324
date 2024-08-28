@@ -72,6 +72,10 @@ public class NFController {
 		currentState = LOGGED_OUT;
 	}
 
+	public void setCurrentState(byte currentState) {
+		this.currentState = currentState;
+	}
+	
 	/**
 	 * Método que procesa los comandos introducidos por un usuario. Se encarga
 	 * principalmente de invocar los métodos adecuados de NFControllerLogicDir y
@@ -280,10 +284,17 @@ public class NFController {
 				}
 				break;
 			}
+			
+			case NFCommands.COM_STOP_SERVER:{
+				if (currentState != SERVER) {
+					commandAllowed = false;
+					System.err.println("*You cannot run this command because you are not a peer");
+				}
+				break;
+			}
 
 		default:
-			// System.err.println("ERROR: undefined behaviour for " + currentCommand + "
-			// command!");
+			 System.err.println("ERROR: undefined behaviour for " + currentCommand + " command!");
 		}
 		return commandAllowed;
 	}
@@ -312,12 +323,13 @@ public class NFController {
 				currentState = SERVER;
 				break;
 			}	
-//			
-//			case NFServerSimple.STOP_SERVER_COMMAND:{
-//				
-//			}
 			
-		default:
+			case NFCommands.COM_STOP_SERVER:{
+				currentState = LOGGED_IN;
+				break;
+			}
+			
+		default: System.err.println("ERROR: could not change the current state");
 		}
 
 	}
