@@ -451,7 +451,7 @@ public class DirectoryConnector {
 	 */
 	public String[] getServerNicknamesSharingThisFile(String fileHash) {
 		String[] nicklist = null;
-		// TODO: Ver TODOs en logIntoDirectory y seguir esquema similar
+		// DONE: Ver TODOs en logIntoDirectory y seguir esquema similar
 		DirMessage dirMessageToDirectory = new DirMessage(DirMessageOps.OPERATION_GET_SEARCHED);
 		dirMessageToDirectory.setSessionKey(sessionKey);
 		dirMessageToDirectory.setFileHash(fileHash);

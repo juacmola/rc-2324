@@ -292,7 +292,7 @@ public class DirMessage {
 			}
 			
 			case DirMessageOps.OPERATION_SEARCHED_RESP:{
-				for (int i=0; i< fileServers.size(); i++) sb.append(FIELDNAME_SERVER + DELIMITER + fileServers + END_LINE);
+				sb.append(FIELDNAME_SERVER + DELIMITER + fileServers + END_LINE);
 				break;
 			}
 		}

@@ -101,7 +101,7 @@ public class NFControllerLogicDir {
 	 */
 	protected boolean getAndPrintUserList() {
 		/*
-		 * TODO: Obtener la lista de usuarios registrados. Comunicarse con el directorio
+		 * DONE: Obtener la lista de usuarios registrados. Comunicarse con el directorio
 		 * (a través del directoryConnector) para obtener la lista de nicks registrados
 		 * e imprimirla por pantalla. Devolver éxito/fracaso de la operación.
 		 */
@@ -293,9 +293,10 @@ public class NFControllerLogicDir {
 		servers = directoryConnector.getServerNicknamesSharingThisFile(fileHashSubstring);
 		if (servers != null){
 			System.out.print("Lista de servidores que comparten dicho hash: ");
-			for (String str : servers) {
-        System.out.println(str + ", ");
-			}
+			System.out.println(servers[servers.length-1] + ".");
+//			for (String str : servers) {
+//        System.out.println(str + ", ");
+//			}
 			result = true;
 		}else {
 			System.out.println("This file was nos published yet"); 

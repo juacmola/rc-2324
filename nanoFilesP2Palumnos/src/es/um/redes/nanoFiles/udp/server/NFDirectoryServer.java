@@ -60,7 +60,7 @@ public class NFDirectoryServer {
 	/**
 	 * Estructura para guardar los ficheros publicados por cada servidor
 	 */
-	private HashMap<Integer, List<FileInfo>> published;	//sessionKey|File
+	private HashMap<Integer, List<FileInfo>> published;	//sessionKey|FileInfo
 	
 	/**
 	 * Estructura para guardar los nick que tienen un archivo
@@ -200,7 +200,7 @@ public class NFDirectoryServer {
 
 	private DirMessage buildResponseFromRequest(DirMessage msg, InetSocketAddress clientAddr) {
 		/*
-		 * TODO: Construir un DirMessage con la respuesta en función del tipo de mensaje
+		 * DONE: Construir un DirMessage con la respuesta en función del tipo de mensaje
 		 * recibido, leyendo/modificando según sea necesario los atributos de esta clase
 		 * (el "estado" guardado en el directorio: nicks, sessionKeys, servers,
 		 * files...)
@@ -208,9 +208,6 @@ public class NFDirectoryServer {
 		String operation = msg.getOperation();
 
 		DirMessage response = null;
-
-
-
 
 		switch (operation) {
 			case DirMessageOps.OPERATION_LOGIN: {
@@ -270,12 +267,7 @@ public class NFDirectoryServer {
 				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
 				 * servidor
 				 */
-				System.out.println("operation:" + response.getOperation());
-				System.out.println("Arreglad lo que escribe el directorio una vez acaba userlist");
-//				for (int i=0; i< response.getUsersList().size(); i++)
-//					System.out.println("user:" + userlist.get(i));
-				
-				System.out.println();
+				System.out.println("operation:" + response.getOperation() + "\n\n");
 				break;
 			}
 			
@@ -367,7 +359,7 @@ public class NFDirectoryServer {
 				else {
 					for (FileInfo file : files) {
 						published.computeIfAbsent(sessionKey, k -> new ArrayList<>()).add(file);
-						searched.computeIfAbsent(file.getHash(), k -> new ArrayList<>()).add(sessionKeys.get(sessionKey));
+						searched.computeIfAbsent(file.getHash().toLowerCase(), k -> new ArrayList<>()).add(sessionKeys.get(sessionKey));
 					}
 
 					FileInfo.printToSysout(files);
@@ -415,13 +407,16 @@ public class NFDirectoryServer {
 				String fileHash = msg.getFileHash();
 				ArrayList<String> servers = null;
 				
-				if (searched.isEmpty() || !searched.containsKey(fileHash)) response = new DirMessage(DirMessageOps.OPERATION_SEARCHED_FAIL);
-				else{
-					servers = (ArrayList<String>) searched.get(fileHash);
-					response = new DirMessage(DirMessageOps.OPERATION_SEARCHED_RESP);
-					response.setFileServer(servers);
+				for (String key : searched.keySet()) {
+					if (key.contains(fileHash)) {
+						servers = (ArrayList<String>) searched.get(key);
+						response = new DirMessage(DirMessageOps.OPERATION_SEARCHED_RESP);
+		        response.setFileServer(servers);
+						break;
+					}
 				}
-
+		    if (servers == null) response = new DirMessage(DirMessageOps.OPERATION_SEARCHED_FAIL);
+				
 				/*
 				 * DONE: Imprimimos por pantalla el resultado de procesar la petición recibida
 				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el

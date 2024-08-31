@@ -235,9 +235,15 @@ public class NFController {
 		boolean commandAllowed = true;
 		switch (currentCommand) {
 		
-			case NFCommands.COM_MYFILES:
-			case NFCommands.COM_QUIT: {
-				
+			case NFCommands.COM_MYFILES: {
+				break;
+			}
+			
+			case NFCommands.COM_QUIT:{
+				if (currentState != LOGGED_OUT) {
+					commandAllowed = false;
+					System.err.println("* You cannot quit because you are logged in from the directory");
+				}
 				break;
 			}
 			
@@ -250,9 +256,13 @@ public class NFController {
 			}
 			
 			case NFCommands.COM_LOGOUT : {
-				if (currentState != LOGGED_IN) {
+				if (currentState == LOGGED_OUT) {
 					commandAllowed = false;
 					System.err.println("* You cannot log out because you are not logged in to the directory");
+				}
+				else if (currentState == SERVER) {
+					commandAllowed = false;
+					System.err.println("* You cannot log out because you are a peer");
 				}
 				break;
 			}
@@ -267,6 +277,7 @@ public class NFController {
 				break;
 			}
 			
+			case NFCommands.COM_USERLIST:
 			case NFCommands.COM_FILELIST:
 			case NFCommands.COM_SEARCH: {
 				if (currentState != LOGGED_IN && currentState != SERVER) {
@@ -275,7 +286,6 @@ public class NFController {
 				}
 				break;
 			}
-			
 			
 			case NFCommands.COM_PUBLISH:{
 				if (currentState != SERVER) {
@@ -292,7 +302,7 @@ public class NFController {
 				}
 				break;
 			}
-
+			
 		default:
 			 System.err.println("ERROR: undefined behaviour for " + currentCommand + " command!");
 		}
@@ -326,6 +336,13 @@ public class NFController {
 			
 			case NFCommands.COM_STOP_SERVER:{
 				currentState = LOGGED_IN;
+				break;
+			}
+			
+			case NFCommands.COM_USERLIST:
+			case NFCommands.COM_FILELIST:
+			case NFCommands.COM_PUBLISH: 
+			case NFCommands.COM_SEARCH: {
 				break;
 			}
 			
