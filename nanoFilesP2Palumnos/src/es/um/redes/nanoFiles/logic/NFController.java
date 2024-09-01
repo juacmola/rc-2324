@@ -15,16 +15,13 @@ public class NFController {
 	/**
 	 * Diferentes estados del cliente de acuerdo con el autómata
 	 */
+	/*
+	 * DONE: Añadir más constantes que representen los estados del autómata del
+	 * cliente de directorio.
+	 */
 	private static final byte LOGGED_OUT = 0;
 	private static final byte LOGGED_IN = 1;
 	private static final byte SERVER = 2;
-	/*
-	 * TODO: Añadir más constantes que representen los estados del autómata del
-	 * cliente de directorio.
-	 */
-
-
-
 
 	/**
 	 * Shell para leer comandos de usuario de la entrada estándar
@@ -226,8 +223,7 @@ public class NFController {
 	 * usuario, en función del estado del autómata en el que nos encontramos.
 	 */
 	public boolean canProcessCommandInCurrentState() {
-		/*
-		 * TODO: Para cada comando tecleado en el shell (currentCommand), comprobar
+		/*DONE: Para cada comando tecleado en el shell (currentCommand), comprobar
 		 * "currentState" para ver si dicho comando es válido según el estado actual del
 		 * autómata, ya que no todos los comandos serán válidos en cualquier estado.
 		 * Este método NO debe modificar clientStatus.
@@ -267,16 +263,20 @@ public class NFController {
 				break;
 			}
 			//Case generalizado para todos los mensajes que no suponen un cambio de estado en el autómata y que solo se pueden ejecutar si estás logueado en el directorio.
-			case NFCommands.COM_DOWNLOADFROM:
 			case NFCommands.COM_FGSERVE:
 			case NFCommands.COM_BGSERVE: {
-				if (currentState != LOGGED_IN) {
+				if (currentState == LOGGED_OUT) {
 					commandAllowed = false;
 					System.err.println("*You cannot run this command because you are not logged into the directory");
+				}
+				else if (currentState == SERVER) {
+					commandAllowed = false;
+					System.err.println("*You cannot run this command because you are a Peer already");
 				}
 				break;
 			}
 			
+			case NFCommands.COM_DOWNLOADFROM:
 			case NFCommands.COM_USERLIST:
 			case NFCommands.COM_FILELIST:
 			case NFCommands.COM_SEARCH: {
@@ -310,8 +310,7 @@ public class NFController {
 	}
 
 	private void updateCurrentState(boolean success) {
-		/*
-		 * TODO: Si el comando ha sido procesado con éxito, debemos actualizar
+		/*DONE: Si el comando ha sido procesado con éxito, debemos actualizar
 		 * currentState de acuerdo con el autómata diseñado para pasar al siguiente
 		 * estado y así permitir unos u otros comandos en cada caso.
 		 */
@@ -339,6 +338,9 @@ public class NFController {
 				break;
 			}
 			
+			case NFCommands.COM_MYFILES:
+			case NFCommands.COM_DOWNLOADFROM:
+			case NFCommands.COM_DOWNLOAD:
 			case NFCommands.COM_USERLIST:
 			case NFCommands.COM_FILELIST:
 			case NFCommands.COM_PUBLISH: 
