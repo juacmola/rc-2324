@@ -5,12 +5,16 @@ import java.util.TreeMap;
 
 public class PeerMessageOps {
 
-	public static final byte OPCODE_INVALID_CODE = 0;
+	public static final byte OPCODE_INVALID_OPCODE = 0;
 	public static final byte OPCODE_DOWNLOAD_FROM = 1;
-	public static final byte OPCODE_DOWNLOAD_OK = 2;
-	public static final byte OPCODE_FILE_NOT_FOUND = 3;
-	public static final byte OPCODE_AMBIGUOUS_HASH = 4;
-	public static final byte OPCODE_END_OF_FILE = 5;
+	//public static final byte OPCODE_DOWNLOAD_OK = 2;
+	public static final byte OPCODE_DOWNLOAD_FROM_RESP = 2;
+	public static final byte OPCODE_DOWNLOAD_FROM_RESP_HS = 3;
+	//public static final byte OPCODE_FILE_NOT_FOUND = 3;
+	public static final byte OPCODE_DOWNLOAD_FROM_WHICH = 4;
+	//public static final byte OPCODE_AMBIGUOUS_HASH = 4;
+	public static final byte OPCODE_DOWNLOAD_FROM_FAIL = 5;
+	//public static final byte OPCODE_END_OF_FILE = 5;
 	public static final byte OPCODE_TEST = 9;
 	
 
@@ -20,22 +24,30 @@ public class PeerMessageOps {
 	 * representación textual a "valid_operations_str" en el mismo orden
 	 */
 	private static final Byte[] _valid_opcodes = {
-			OPCODE_INVALID_CODE,
+			OPCODE_INVALID_OPCODE,
 			OPCODE_DOWNLOAD_FROM,
-			OPCODE_DOWNLOAD_OK,
-			OPCODE_FILE_NOT_FOUND,
-			OPCODE_AMBIGUOUS_HASH,
-			OPCODE_END_OF_FILE,
+			//OPCODE_DOWNLOAD_OK,
+			OPCODE_DOWNLOAD_FROM_RESP,
+			OPCODE_DOWNLOAD_FROM_RESP_HS,
+			//OPCODE_FILE_NOT_FOUND,
+			OPCODE_DOWNLOAD_FROM_WHICH,
+			//OPCODE_AMBIGUOUS_HASH,
+			OPCODE_DOWNLOAD_FROM_FAIL,
+			//OPCODE_END_OF_FILE,
 			OPCODE_TEST,
 			
 			};
 	private static final String[] _valid_operations_str = {
 			"INVALID_OPCODE",
 			"DOWNLOAD_FROM",
-			"DOWNLOAD_OK",
-			"FILE_NOT_FOUND",
-			"AMBIGUOUS_HASH",
-			"END_OF_FILE",
+			//"DOWNLOAD_OK",
+			"DOWNLOAD_FROM_RESP",
+			"DOWNLOAD_FROM_RESP_HS",
+			//"FILE_NOT_FOUND",
+			"DOWNLOAD_FROM_WHICH",
+			//"AMBIGUOUS_HASH",
+			"DOWNLOAD_FROM_FAIL",
+			//"END_OF_FILE",
 			"TEST"
 			};
 
@@ -54,7 +66,7 @@ public class PeerMessageOps {
 	 * Transforma una cadena en el opcode correspondiente
 	 */
 	public static byte operationToOpcode(String opStr) {
-		return _operation_to_opcode.getOrDefault(opStr.toLowerCase(), OPCODE_INVALID_CODE);
+		return _operation_to_opcode.getOrDefault(opStr.toLowerCase(), OPCODE_INVALID_OPCODE);
 	}
 
 	/**
