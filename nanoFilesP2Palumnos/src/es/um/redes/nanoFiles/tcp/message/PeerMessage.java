@@ -146,6 +146,7 @@ public class PeerMessage {
 				String[] strArrFileNames = strConcatenatedFileNames.split("/");
 				message.setHashes(new ArrayList<>(Arrays.asList(strArrHashes)));
 				message.setFileNames(new ArrayList<>(Arrays.asList(strArrFileNames)));
+				break;
 			}
 				
 				
@@ -160,11 +161,13 @@ public class PeerMessage {
 			}
 			*/
 			
+			/*
 			case PeerMessageOps.OPCODE_TEST: {
 				System.out.println("The reading works");
 				break;
 			}
-		
+			*/
+			
 			default:
 			System.err.println("PeerMessage.readMessageFromInputStream doesn't know how to parse this message opcode: "
 					+ PeerMessageOps.opcodeToOperation(opcode));
@@ -250,11 +253,13 @@ public class PeerMessage {
 			}
 			*/
 			
+			/*
 			case PeerMessageOps.OPCODE_TEST: {
 				System.out.println("The writing works");
 				break;
 			}
-		
+			*/
+			
 			default:
 				System.err.println("PeerMessage.writeMessageToOutputStream found unexpected message opcode " + opcode + "("
 					+ PeerMessageOps.opcodeToOperation(opcode) + ")");

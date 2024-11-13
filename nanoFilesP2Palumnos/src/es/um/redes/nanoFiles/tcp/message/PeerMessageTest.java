@@ -4,47 +4,16 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import es.um.redes.nanoFiles.application.NanoFiles;
-import es.um.redes.nanoFiles.util.FileInfo;
+import java.util.ArrayList;
 
 public class PeerMessageTest {
 
 	public static void main(String[] args) throws IOException {
-//		String nombreArchivo = "./nf-shared/peermsg.bin";
-//		DataOutputStream fos = new DataOutputStream(new FileOutputStream(nombreArchivo));
-		try {
-			File f = new File("./nf-shared/prueba.txt");
-			DataInputStream dis = new DataInputStream(new FileInputStream(f));
-			long filelength = f.length();
-			byte data[] = new byte[(int) filelength];
-			dis.readFully(data);
-			dis.close();
-		
-			FileInfo arrayfileinfo[] = NanoFiles.db.getFiles();
-			
-		// Create a DataOutputStream to write to a file
-      String outputFile = "./nf-shared/output.txt";
-      DataOutputStream dos = new DataOutputStream(new FileOutputStream(outputFile));
-      dos.write(data); // Write the file content to the output file
-      dos.close();
+		String nombreArchivo = "peermsg.bin";
+		DataOutputStream fos = new DataOutputStream(new FileOutputStream(nombreArchivo));
 
-			
-			System.out.println("File content:");
-			System.out.println(new String(data)); // Print the file content
-		}catch (FileNotFoundException e) {
-			System.err.println("File not found: prueba.txt");
-      e.printStackTrace();
-		}
-		catch (IOException e) {
-      e.printStackTrace();
-		}
-		
-		
-	
 		/*
 		 * TODO: Probar a crear diferentes tipos de mensajes (con los opcodes válidos
 		 * definidos en PeerMessageOps), estableciendo los atributos adecuados a cada
@@ -52,49 +21,86 @@ public class PeerMessageTest {
 		 * writeMessageToOutputStream para comprobar que readMessageFromInputStream
 		 * construye un mensaje idéntico al original.
 		 */
+		PeerMessage msgOut = new PeerMessage();
+		
 		/*
-		byte opcode = PeerMessageOps.operationToOpcode("DOWNLOAD_FROM");
-		int length = 2;
-		byte[] value = {9, 8};
-		PeerMessage msgOut = new PeerMessage(opcode);
-		msgOut.setHash("123456");
+		//InvalidOpCode
+		msgOut.setOpcode(PeerMessageOps.OPCODE_INVALID_OPCODE);
+		*/
+		
+		/*
+		//DownloadFrom
+		msgOut.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM);
+		msgOut.setHash("f93e3551b61f41fb7d6c410a47aba01df0cb9b56");
+		*/
+		
+		File f = new File("nf-shared/prueba.txt");
+		DataInputStream dis = new DataInputStream(new FileInputStream(f));
+		long fLength = f.length();
+		byte[] dataF = new byte[(int) fLength];
+		dis.readFully(dataF);
+		dis.close();
+		
+		/*
+		//DownloadFromResp
+		msgOut.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP);
+		msgOut.setHash("f93e3551b61f41fb7d6c410a47aba01df0cb9b56");
+		msgOut.setDataFile(dataF);
+		*/
+		
+		/*
+		//DownloadFromRespHS
+		msgOut.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP_HS);
+		msgOut.setFileFragments(3);
+		msgOut.setHash("f93e3551b61f41fb7d6c410a47aba01df0cb9b56");
+		msgOut.setDataFile(dataF);
+		*/
+		
+		//DownloadFromWhich
+		msgOut.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_WHICH);
+		ArrayList<String> hashes = new ArrayList<>();
+		hashes.add("7d8c87e057be98f00f22e23b23fbf08999e4b02f");
+		hashes.add("f93e3551b61f41fb7d6c410a47aba01df0cb9b56");
+		msgOut.setHashes(hashes);
+		ArrayList<String> fileNames = new ArrayList<>();
+		fileNames.add("factura1.pdf");
+		fileNames.add("factura2.pdf");
+		msgOut.setFileNames(hashes);
+		
+		/*
+		//DownloadFromFAIL
+		msgOut.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_FAIL);
+		*/
+		
 		msgOut.writeMessageToOutputStream(fos);
 
 		DataInputStream fis = new DataInputStream(new FileInputStream(nombreArchivo));
 		PeerMessage msgIn = PeerMessage.readMessageFromInputStream((DataInputStream) fis);
-		
 		/*
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		/* TODO: Comprobar que coinciden los valores de los atributos relevantes al tipo
+		 * TODO: Comprobar que coinciden los valores de los atributos relevantes al tipo
 		 * de mensaje en ambos mensajes (msgOut y msgIn), empezando por el opcode.
 		 */
-		/*
 		if (msgOut.getOpcode() != msgIn.getOpcode()) {
 			System.err.println("Opcode does not match!");
 		}
-		if (msgOut.getLength() != msgIn.getLength()) {
-			System.err.println("Length does not match!");
-		}
-		if (!msgOut.getHash().equals(msgIn.getHash())) {
+		
+		/*
+		else if (!msgOut.getHash().equals(msgIn.getHash()))
 			System.err.println("Hash does not match!");
-		}*/
+		
+		System.out.println(new String(msgOut.getDataFile(), "UTF-8"));
+		System.out.println(new String(msgIn.getDataFile(), "UTF-8"));
+		*/
+		
+		if (msgOut.getFileFragments() != msgIn.getFileFragments())
+			System.err.println("File fragments does not match!");
+		
+		else if (!msgIn.getHashes().equals(msgOut.getHashes()))
+			System.err.println("Hashes does not match!");
+		
+		else if (!msgIn.getFileNames().equals(msgOut.getFileNames()))
+			System.err.println("File names does not match!");
+		
 	}
 
 }

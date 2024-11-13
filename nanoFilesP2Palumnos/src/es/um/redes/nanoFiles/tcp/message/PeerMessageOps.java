@@ -15,7 +15,7 @@ public class PeerMessageOps {
 	//public static final byte OPCODE_AMBIGUOUS_HASH = 4;
 	public static final byte OPCODE_DOWNLOAD_FROM_FAIL = 5;
 	//public static final byte OPCODE_END_OF_FILE = 5;
-	public static final byte OPCODE_TEST = 9;
+	//public static final byte OPCODE_TEST = 9;
 	
 
 	/**
@@ -34,7 +34,7 @@ public class PeerMessageOps {
 			//OPCODE_AMBIGUOUS_HASH,
 			OPCODE_DOWNLOAD_FROM_FAIL,
 			//OPCODE_END_OF_FILE,
-			OPCODE_TEST,
+			//OPCODE_TEST,
 			
 			};
 	private static final String[] _valid_operations_str = {
@@ -48,7 +48,7 @@ public class PeerMessageOps {
 			//"AMBIGUOUS_HASH",
 			"DOWNLOAD_FROM_FAIL",
 			//"END_OF_FILE",
-			"TEST"
+			//"TEST"
 			};
 
 	private static Map<String, Byte> _operation_to_opcode;
