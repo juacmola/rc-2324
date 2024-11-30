@@ -29,10 +29,8 @@ public class PeerMessage {
 	 * 
 	 */
 	private String hash;
-	//private int length;
-	//private FileInfo fileInfo;
 	private byte[] dataFile;
-	private int fileFragments;
+	private long fileFragments;
 	private ArrayList<String> hashes = new ArrayList<>();
 	private ArrayList<String> fileNames = new ArrayList<>();
 
@@ -50,17 +48,15 @@ public class PeerMessage {
 	 */
 	public byte getOpcode() { return opcode;	}
 	public String getHash() { return hash;	}
-	//public int getLength() { return length; }
 	public byte[] getDataFile() { return dataFile; }
-	public int getFileFragments() { return fileFragments;	}
+	public long getFileFragments() { return fileFragments;	}
 	public ArrayList<String> getHashes() { return hashes;	}
 	public ArrayList<String> getFileNames() { return fileNames;	}
 	
 	public void setOpcode(byte op) { this.opcode = op;	}
 	public void setHash(String val) { this.hash = val;	}
-	//public void setLength(int len) { this.length = len;	}
 	public void setDataFile(byte[] dataFile) { this.dataFile = dataFile;	}
-	public void setFileFragments(int fileFragments) { this.fileFragments = fileFragments;	}
+	public void setFileFragments(long fileFragments) { this.fileFragments = fileFragments;	}
 	public void setHashes(ArrayList<String> hashes) { this.hashes = hashes;	}
 	public void setFileNames(ArrayList<String> fileNames) { this.fileNames = fileNames;	}
 
@@ -86,7 +82,7 @@ public class PeerMessage {
 		message.setOpcode(opcode);
 		
 		switch (opcode) {
-			//case PeerMessageOps.OPCODE_AMBIGUOUS_HASH:
+			
 			case PeerMessageOps.OPCODE_INVALID_OPCODE:
 			case PeerMessageOps.OPCODE_DOWNLOAD_FROM_FAIL: {
 				
@@ -102,33 +98,21 @@ public class PeerMessage {
 				break;
 			}
 			
-			//case PeerMessageOps.OPCODE_END_OF_FILE:
-			case PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP: {
-				//int lenFile=dis.readInt();
+			case PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP_HS: {
+				long fileFragments = dis.readLong();
 				int hashLength = dis.readInt();
 				byte[] dataHash = new byte[hashLength];
 				dis.readFully(dataHash);
 				String strHash = new String(dataHash,"UTF-8");
-				int dataFileLength = dis.readInt();
-				byte[] dataFile = new byte[dataFileLength];
-				dis.readFully(dataFile);
-				//message.setLength(lenFile);
+				message.setFileFragments(fileFragments);
 				message.setHash(strHash);
-				message.setDataFile(dataFile);
 				break;
 			}
 			
-			case PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP_HS: {
-				int fileFragments = dis.readInt();
-				int hashLength = dis.readInt();
-				byte[] dataHash = new byte[hashLength];
-				dis.readFully(dataHash);
-				String strHash = new String(dataHash,"UTF-8");
+			case PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP: {
 				int dataFileLength = dis.readInt();
 				byte[] dataFile = new byte[dataFileLength];
 				dis.readFully(dataFile);
-				message.setFileFragments(fileFragments);
-				message.setHash(strHash);
 				message.setDataFile(dataFile);
 				break;
 			}
@@ -148,25 +132,6 @@ public class PeerMessage {
 				message.setFileNames(new ArrayList<>(Arrays.asList(strArrFileNames)));
 				break;
 			}
-				
-				
-			/*
-			case PeerMessageOps.OPCODE_FILE_NOT_FOUND: { //Nos quedamos con la cadena hash
-				int len=dis.readInt();
-				byte[] data=new byte[len];
-				dis.readFully(data);
-				String str=new String(data,"UTF-8");
-				message.setHash(str);
-				break;
-			}
-			*/
-			
-			/*
-			case PeerMessageOps.OPCODE_TEST: {
-				System.out.println("The reading works");
-				break;
-			}
-			*/
 			
 			default:
 			System.err.println("PeerMessage.readMessageFromInputStream doesn't know how to parse this message opcode: "
@@ -198,8 +163,7 @@ public class PeerMessage {
 		 */
 
 		dos.writeByte(opcode);
-		switch (opcode) {
-			//case PeerMessageOps.OPCODE_AMBIGUOUS_HASH: 
+		switch (opcode) { 
 			case PeerMessageOps.OPCODE_INVALID_OPCODE:
 			case PeerMessageOps.OPCODE_DOWNLOAD_FROM_FAIL: {
 		 
@@ -213,21 +177,15 @@ public class PeerMessage {
 				break;
 			}
 
-			//case PeerMessageOps.OPCODE_END_OF_FILE:
-			case PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP: {
+			case PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP_HS: {
 				byte[] dataHash = hash.getBytes("UTF-8");
+				dos.writeLong(fileFragments);
 				dos.writeInt(dataHash.length);
 				dos.write(dataHash);
-				dos.writeInt(dataFile.length);
-				dos.write(dataFile);
 				break;
 			}
 			
-			case PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP_HS: {
-				byte[] dataHash = hash.getBytes("UTF-8");
-				dos.writeInt(fileFragments);
-				dos.writeInt(dataHash.length);
-				dos.write(dataHash);
+			case PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP: {
 				dos.writeInt(dataFile.length);
 				dos.write(dataFile);
 				break;
@@ -243,31 +201,9 @@ public class PeerMessage {
 				break;
 			}
 			
-			
-			/*
-			case PeerMessageOps.OPCODE_FILE_NOT_FOUND: {
-				byte[] data=hash.getBytes("UTF-8");
-				dos.writeInt(data.length);
-				dos.write(data);
-				break;
-			}
-			*/
-			
-			/*
-			case PeerMessageOps.OPCODE_TEST: {
-				System.out.println("The writing works");
-				break;
-			}
-			*/
-			
 			default:
 				System.err.println("PeerMessage.writeMessageToOutputStream found unexpected message opcode " + opcode + "("
 					+ PeerMessageOps.opcodeToOperation(opcode) + ")");
 		}
 	}
-
-
-
-
-
 }

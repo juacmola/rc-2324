@@ -42,20 +42,19 @@ public class PeerMessageTest {
 		dis.close();
 		
 		/*
-		//DownloadFromResp
-		msgOut.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP);
-		msgOut.setHash("f93e3551b61f41fb7d6c410a47aba01df0cb9b56");
-		msgOut.setDataFile(dataF);
-		*/
-		
-		/*
 		//DownloadFromRespHS
 		msgOut.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP_HS);
 		msgOut.setFileFragments(3);
 		msgOut.setHash("f93e3551b61f41fb7d6c410a47aba01df0cb9b56");
+		*/
+		
+		/*
+		//DownloadFromResp
+		msgOut.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP);
 		msgOut.setDataFile(dataF);
 		*/
 		
+		/*
 		//DownloadFromWhich
 		msgOut.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_WHICH);
 		ArrayList<String> hashes = new ArrayList<>();
@@ -66,11 +65,12 @@ public class PeerMessageTest {
 		fileNames.add("factura1.pdf");
 		fileNames.add("factura2.pdf");
 		msgOut.setFileNames(hashes);
+		*/
 		
-		/*
+		
 		//DownloadFromFAIL
 		msgOut.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_FAIL);
-		*/
+		
 		
 		msgOut.writeMessageToOutputStream(fos);
 
@@ -87,11 +87,12 @@ public class PeerMessageTest {
 		/*
 		else if (!msgOut.getHash().equals(msgIn.getHash()))
 			System.err.println("Hash does not match!");
-		
+		*/
+		/*
 		System.out.println(new String(msgOut.getDataFile(), "UTF-8"));
 		System.out.println(new String(msgIn.getDataFile(), "UTF-8"));
 		*/
-		
+		/*
 		if (msgOut.getFileFragments() != msgIn.getFileFragments())
 			System.err.println("File fragments does not match!");
 		
@@ -100,7 +101,7 @@ public class PeerMessageTest {
 		
 		else if (!msgIn.getFileNames().equals(msgOut.getFileNames()))
 			System.err.println("File names does not match!");
-		
+		*/
 	}
 
 }

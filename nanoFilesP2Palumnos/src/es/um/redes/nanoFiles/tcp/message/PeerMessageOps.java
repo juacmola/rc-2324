@@ -7,16 +7,10 @@ public class PeerMessageOps {
 
 	public static final byte OPCODE_INVALID_OPCODE = 0;
 	public static final byte OPCODE_DOWNLOAD_FROM = 1;
-	//public static final byte OPCODE_DOWNLOAD_OK = 2;
-	public static final byte OPCODE_DOWNLOAD_FROM_RESP = 2;
-	public static final byte OPCODE_DOWNLOAD_FROM_RESP_HS = 3;
-	//public static final byte OPCODE_FILE_NOT_FOUND = 3;
+	public static final byte OPCODE_DOWNLOAD_FROM_RESP_HS = 2;
+	public static final byte OPCODE_DOWNLOAD_FROM_RESP = 3;
 	public static final byte OPCODE_DOWNLOAD_FROM_WHICH = 4;
-	//public static final byte OPCODE_AMBIGUOUS_HASH = 4;
 	public static final byte OPCODE_DOWNLOAD_FROM_FAIL = 5;
-	//public static final byte OPCODE_END_OF_FILE = 5;
-	//public static final byte OPCODE_TEST = 9;
-	
 
 	/**
 	 * TODO: Definir constantes con nuevos opcodes de mensajes
@@ -26,29 +20,19 @@ public class PeerMessageOps {
 	private static final Byte[] _valid_opcodes = {
 			OPCODE_INVALID_OPCODE,
 			OPCODE_DOWNLOAD_FROM,
-			//OPCODE_DOWNLOAD_OK,
-			OPCODE_DOWNLOAD_FROM_RESP,
 			OPCODE_DOWNLOAD_FROM_RESP_HS,
-			//OPCODE_FILE_NOT_FOUND,
+			OPCODE_DOWNLOAD_FROM_RESP,
 			OPCODE_DOWNLOAD_FROM_WHICH,
-			//OPCODE_AMBIGUOUS_HASH,
-			OPCODE_DOWNLOAD_FROM_FAIL,
-			//OPCODE_END_OF_FILE,
-			//OPCODE_TEST,
-			
+			OPCODE_DOWNLOAD_FROM_FAIL
 			};
+	
 	private static final String[] _valid_operations_str = {
 			"INVALID_OPCODE",
 			"DOWNLOAD_FROM",
-			//"DOWNLOAD_OK",
-			"DOWNLOAD_FROM_RESP",
 			"DOWNLOAD_FROM_RESP_HS",
-			//"FILE_NOT_FOUND",
+			"DOWNLOAD_FROM_RESP",
 			"DOWNLOAD_FROM_WHICH",
-			//"AMBIGUOUS_HASH",
-			"DOWNLOAD_FROM_FAIL",
-			//"END_OF_FILE",
-			//"TEST"
+			"DOWNLOAD_FROM_FAIL"
 			};
 
 	private static Map<String, Byte> _operation_to_opcode;

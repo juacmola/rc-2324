@@ -11,6 +11,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import es.um.redes.nanoFiles.application.NanoFiles;
 import es.um.redes.nanoFiles.tcp.message.PeerMessage;
@@ -24,20 +26,21 @@ public class NFServerComm {
 		DataInputStream dis = new DataInputStream(socket.getInputStream());
 		DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
 		PeerMessage readMessage;
-		PeerMessage writeMessage;
+		PeerMessage writeMessage = new PeerMessage();
 		String path = "";
-		String nombreArchivo = "peermsg.bin";
 		String targethash = "";
-		DataOutputStream fos = new DataOutputStream(new FileOutputStream(nombreArchivo));
+		long fileFragments;
+		int fragmentSize = 8192;
 		
 		/* TODO: Mientras el cliente esté conectado, leer mensajes de socket,
 		 * convertirlo a un objeto PeerMessage y luego actuar en función del tipo de
 		 * mensaje recibido, enviando los correspondientes mensajes de respuesta.*/
+		//quizas sea un while
 		if (socket.isConnected()) {
 				readMessage = PeerMessage.readMessageFromInputStream(dis);
 
 				switch(readMessage.getOpcode()) {
-					case PeerMessageOps.OPCODE_DOWNLOAD_FROM: {
+					case PeerMessageOps.OPCODE_DOWNLOAD_FROM:
 						/* TODO: Para servir un fichero, hay que localizarlo a partir de su hash (o
 						 * subcadena) en nuestra base de datos de ficheros compartidos. Los ficheros
 						 * compartidos se pueden obtener con NanoFiles.db.getFiles(). El método
@@ -48,75 +51,61 @@ public class NFServerComm {
 						String hashToClient = "";
 						FileInfo[] files = NanoFiles.db.getFiles();
 						FileInfo[] filesMiniHash = FileInfo.lookupHashSubstring(files, targethash);
-
-						int numFiles=0;
-						for (FileInfo file : filesMiniHash) {
-							path = NanoFiles.db.lookupFilePath(file.fileHash);
-							hashToClient = file.fileHash;
-							numFiles++;
-						}
-						if (numFiles>1) {
-							writeMessage = new PeerMessage(PeerMessageOps.OPCODE_AMBIGUOUS_HASH);
-							System.err.println("Client sent ambiguous hash");
-						}
-						int paquete = 0;
-						try {
-							File f = new File(path);
-							DataInputStream fis = new DataInputStream(new FileInputStream(f));
-							int fileLength = (int) f.length();
-
-							while (fileLength!=0) {
-								if (fileLength % 8192 == fileLength) {
-									byte data[] = new byte[(int) fileLength];
-									fis.readFully(data);
-
-									writeMessage = new PeerMessage(PeerMessageOps.OPCODE_END_OF_FILE);
-									System.out.println("Este es el opcode: " + writeMessage.getOpcode());
-									writeMessage.setLength(fileLength);
-									writeMessage.setHash(hashToClient);
-									writeMessage.setFile(data);
-									writeMessage.writeMessageToOutputStream(dos);
+						
+						switch(filesMiniHash.length) {
+							case 0:
+								writeMessage.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_FAIL);
+								break;
+							
+							case 1: 
+								writeMessage.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP_HS);
+								fileFragments = (filesMiniHash[0].fileSize + fragmentSize - 1) / fragmentSize;
+								hashToClient = filesMiniHash[0].fileHash;
+								writeMessage.setFileFragments(fileFragments);
+								writeMessage.setHash(hashToClient);
+								writeMessage.writeMessageToOutputStream(dos);
+								
+								path = NanoFiles.db.lookupFilePath(hashToClient);
+								try (DataInputStream fis = new DataInputStream(new FileInputStream(path))){
+									byte[] data = new byte[fragmentSize];
+									int nBytes;
 									
-									fileLength=0;
-									System.out.println("Se envió el último paquete");
-								}else {
-									byte data[] = new byte[8192];
-									fis.readFully(data);
-
-									writeMessage = new PeerMessage(PeerMessageOps.OPCODE_DOWNLOAD_OK);
-									System.out.println("Este es el opcode: " + writeMessage.getOpcode());
-									writeMessage.setLength(fileLength);
-									writeMessage.setHash(hashToClient);
-									writeMessage.setFile(data);
-									writeMessage.writeMessageToOutputStream(dos);
-									System.out.println("Se envió el paquete número " + paquete);
-									paquete++;
-									fileLength-=8192;
+									while((nBytes = fis.read(data)) != -1) {
+										byte[] actualData = Arrays.copyOf(data, nBytes);
+										writeMessage.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_RESP);
+										writeMessage.setDataFile(actualData);
+										writeMessage.writeMessageToOutputStream(dos);
+									}
+								} catch (IOException e) {
+									e.printStackTrace();
 								}
-							}
-
-							fis.close();
-							System.out.println("The download of the file was successful");
-						}catch (FileNotFoundException e) {
-							writeMessage = new PeerMessage(PeerMessageOps.OPCODE_FILE_NOT_FOUND);
-							writeMessage.setHash(targethash);
-							writeMessage.writeMessageToOutputStream(dos);
-							System.err.println("Server could not find the file");
-							e.printStackTrace();
+								break;
+							
+							default: 
+								ArrayList<String> fileNames = new ArrayList<>();
+								ArrayList<String> hashes = new ArrayList<>();
+								
+								for (FileInfo file : filesMiniHash) {
+									hashes.add(file.getHash());
+									fileNames.add(file.fileName);
+								}
+								writeMessage.setOpcode(PeerMessageOps.OPCODE_DOWNLOAD_FROM_WHICH);
+								writeMessage.setHashes(hashes);
+								writeMessage.setFileNames(fileNames);
+								writeMessage.writeMessageToOutputStream(dos);
+				
 						}
-						catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-
+						break;
+						
+					case PeerMessageOps.OPCODE_INVALID_OPCODE:
+						System.err.println("Invalid operation code.");
+						break;
+						
 				}
-		}
-//		dis.close();
-//		dos.close();
-		socket.close();
 	}
-
-
-
+	
+	socket.close();		
+	
+	}
 
 }

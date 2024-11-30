@@ -84,7 +84,10 @@ public class NFServerSimple {
 		/* DONE: Al establecerse la conexión con un peer, la comunicación con dicho
 		 * cliente se hace en el método NFServerComm.serveFilesToClient(socket), al cual
 		 * hay que pasarle el socket devuelto por accept */
-			if (socket != null && !socket.isClosed()) NFServerComm.serveFilesToClient(socket);
+			if (socket != null && !socket.isClosed()) {
+				NFServerComm.serveFilesToClient(socket);
+				System.out.println("Disconnected client " + socket.getInetAddress().toString() + ":" + socket.getPort());
+			}
 		}
 		
 //		if (socket != null) socket.close();

@@ -18,7 +18,9 @@ public class NFServerThread extends Thread {
 
 	@Override
 	public void run() {
-			try { NFServerComm.serveFilesToClient(socket);
+			try {
+				NFServerComm.serveFilesToClient(socket);
+				System.out.println("Disconnected client " + socket.getInetAddress().toString() + ":" + socket.getPort());
 			} catch (IOException e) {e.printStackTrace();}
 	}
 
