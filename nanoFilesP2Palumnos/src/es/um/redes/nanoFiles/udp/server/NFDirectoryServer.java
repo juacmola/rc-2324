@@ -227,7 +227,7 @@ public class NFDirectoryServer {
 				if (nicks.containsKey(username)) {
 					System.out.println("User " + username + " is already connected.");
 					response = new DirMessage(DirMessageOps.OPERATION_LOGINFAIL);
-					response.setNickname(username);
+					//response.setNickname(username); //comentar
 					response.setSessionKey(DirMessageOps.SESSIONKEY_INVALID);
 				}
 			
@@ -237,7 +237,7 @@ public class NFDirectoryServer {
 					nicks.put(username, sessionKey);
 					sessionKeys.put(sessionKey, username);
 					response = new DirMessage(DirMessageOps.OPERATION_LOGINOK);
-					response.setNickname(username);
+					//response.setNickname(username); //comentar
 					response.setSessionKey(nicks.get(username));
 				}
 			
@@ -246,7 +246,9 @@ public class NFDirectoryServer {
 				 * (éxito o fracaso) con los datos relevantes, a modo de depuración en el
 				 * servidor
 				 */
-				System.out.print("operation:" + response.getOperation() + "\nnickname:" + response.getNickname() + "\nsessionKey:" + response.getSessionKey() + "\n\n");
+				System.out.print("operation:" + response.getOperation() +
+						//"\nnickname:" + response.getNickname() + //comentar 
+						"\nsessionKey:" + response.getSessionKey() + "\n\n");
 				break;
 			}
 			

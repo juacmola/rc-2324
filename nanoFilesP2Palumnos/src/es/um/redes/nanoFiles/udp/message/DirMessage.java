@@ -227,7 +227,7 @@ public class DirMessage {
 			
 			case DirMessageOps.OPERATION_LOGINOK:
 			case DirMessageOps.OPERATION_LOGINFAIL: {
-				sb.append(FIELDNAME_NICKNAME + DELIMITER + nickname + END_LINE);
+				//sb.append(FIELDNAME_NICKNAME + DELIMITER + nickname + END_LINE);
 				sb.append(FIELDNAME_SESSIONKEY + DELIMITER + sessionKey + END_LINE);
 				break;
 			}
