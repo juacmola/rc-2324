@@ -10,14 +10,11 @@ The project is intended for educational purpose only.
 
 ## Contents
 
-- [NanoFiles project](#nanofiles-project)
-        - [Disclaimer](#disclaimer)
   - [Contents](#contents)
   - [Introduction](#introduction)
   - [How to Use the Project](#how-to-use-the-project)
   - [Credits](#credits)
   - [License](#license)
-          - [README.md created with ❤️ by juacmola](#readmemd-created-with-️-by-juacmola)
 
 ---
 
