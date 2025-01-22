@@ -20,7 +20,7 @@ The project is intended for educational purpose only.
 
 ## Introduction
 
-This repository contains the NanoFiles Project for the course Redes de Computadores. The course is part of the Degree of Computer Science of the University of Murcia (Universidad de Murcia). This course is being taught in the second semester of the second year of the degree. In this case, our participation in the course was in the academic year 2023/2024.
+This repository contains the NanoFiles Project for the course Redes de Computadores. The course is part of the Degree of Computer Science at University of Murcia (Universidad de Murcia). This course is being taught in the second semester of the second year of the degree. In this case, our participation in the course was in the academic year 2023/2024.
 
 The project involves the design and programming of communication protocols in Java. The practice consists of creating a file transfer and sharing system that we will call NanoFiles, and which is described below.
 The nanoFiles system consists of a directory server (Directory program) and a set of peers (NanoFiles program), which communicate with each other as follows:
@@ -61,7 +61,7 @@ To run the project, you can follow the following steps:
     ```
 
 2. Now, you have a client and the directory running. To try the exchange of files between clients, you can run another `NanoFiles` jar file. You can run as many clients as you want.
-3. In [nf-shared](./nf-shared) directory you will find some files that you can share between clients. You can add more files if you want.
+3. In [/toRun/nf-shared](./toRun/nf-shared) directory you will find some files that you can share between clients. You can add more files if you want.
 
 **To see clearly this exchange, we recommend you to open the clients in different computers. You will need to use the IPs of each computer in the process, but we can assure you will enjoy the result.**
 
@@ -76,7 +76,7 @@ The project was developed by the following people:
 - [juacmola](https://github.com/juacmola)
 - [Effect3](https://github.com/Effect3)
 
-This is part of one of the courses of the Degree of Computer Science of the [Universidad de Murcia](https://www.um.es/web/estudios/grados/informatica) - (Universidad de Murcia).
+This is part of one of the courses of the Degree of Computer Science at [Universidad de Murcia](https://www.um.es/web/estudios/grados/informatica) - (Universidad de Murcia).
 
 [Back to contents](#contents)
 
